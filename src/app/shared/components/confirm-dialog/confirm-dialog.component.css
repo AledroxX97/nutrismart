@@ -1,0 +1,65 @@
+:host {
+  display: contents;
+}
+.backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: #18332770;
+}
+.dialog {
+  width: min(100%, 25rem);
+  padding: 1.4rem;
+  border: 1px solid #e7ece5;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 20px 55px #173f332b;
+}
+.warning-icon {
+  display: grid;
+  width: 2.3rem;
+  height: 2.3rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: #fcf0e7;
+  color: #bd7145;
+  font-weight: 800;
+}
+h2 {
+  margin: 1rem 0 0.35rem;
+  color: #2b4035;
+  font-size: 1.1rem;
+}
+p {
+  margin: 0;
+  color: #7d8981;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 1.3rem;
+}
+button {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid transparent;
+  border-radius: 0.55rem;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.cancel {
+  border-color: #e2e7e0;
+  background: #fff;
+  color: #647269;
+}
+.confirm {
+  background: #b85c42;
+  color: #fff;
+}

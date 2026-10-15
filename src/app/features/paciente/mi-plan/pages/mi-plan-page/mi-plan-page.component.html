@@ -1,0 +1,136 @@
+<main class="my-plan-page">
+  <div class="back-row">
+    <a routerLink="/inicio">← Resumen</a><span>Paciente <span class="crumb">/</span> Mi plan</span>
+  </div>
+  <ns-page-heading
+    title="Mi plan alimentario"
+    description="Consulta tu organización semanal y prepara tu lista de mercado."
+  />
+
+  @if (plan(); as planActual) {
+    <section class="welcome-card">
+      <div class="welcome-icon">✳</div>
+      <div>
+        <span class="eyebrow">PLAN VIGENTE · VERSIÓN {{ planActual.numero_version }}</span>
+        <h2>{{ planActual.nombre }}</h2>
+        <p>
+          Para {{ patientName() }} <span>·</span> Objetivo:
+          {{ planActual.objetivo || 'hábitos saludables' }}
+        </p>
+      </div>
+      <span class="status-pill">✓ Entregado</span>
+    </section>
+    @if (planActual.notas) {
+      <div class="plan-note">
+        <span>Nota de tu nutricionista</span>
+        <p>{{ planActual.notas }}</p>
+      </div>
+    }
+
+    <div class="content-grid">
+      <section class="week-card">
+        <header class="section-heading">
+          <div>
+            <span class="eyebrow">TU ORGANIZACIÓN</span>
+            <h2>Comidas de la semana</h2>
+          </div>
+          <span class="section-count">7 días</span>
+        </header>
+        <nav class="day-tabs" aria-label="Seleccionar día">
+          @for (dia of dias; track dia) {
+            <button
+              type="button"
+              [class.selected]="diaSeleccionado() === dia"
+              (click)="diaSeleccionado.set(dia)"
+            >
+              <small>Día</small><strong>{{ dia }}</strong>
+            </button>
+          }
+        </nav>
+        <div class="day-heading">
+          <h3>Día {{ diaSeleccionado() }}</h3>
+          <span
+            >{{ comidasDia().length }}
+            {{ comidasDia().length === 1 ? 'alimento' : 'alimentos' }}</span
+          >
+        </div>
+        @if (comidasDia().length) {
+          <div class="meal-list">
+            @for (comida of comidasDia(); track comida.id) {
+              <article class="meal-row">
+                <span class="meal-icon">{{
+                  comida.tipo_comida === 'DESAYUNO'
+                    ? '☀'
+                    : comida.tipo_comida === 'ALMUERZO'
+                      ? '◉'
+                      : comida.tipo_comida === 'CENA'
+                        ? '☾'
+                        : '◌'
+                }}</span>
+                <div class="meal-copy">
+                  <small>{{ mealName(comida.tipo_comida) }}</small
+                  ><strong>{{ comida.alimento }}</strong>
+                </div>
+                <span class="portion">{{ comida.cantidad }} {{ comida.unidad }}</span>
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="empty-day">
+            <span>☘</span><strong>Día flexible</strong>
+            <p>
+              No tienes alimentos asignados para este día. Sigue las indicaciones generales de tu
+              plan.
+            </p>
+          </div>
+        }
+      </section>
+
+      <aside class="market-card">
+        <header class="section-heading">
+          <div>
+            <span class="eyebrow">PREPARA TU SEMANA</span>
+            <h2>Lista de mercado</h2>
+          </div>
+          <span class="market-icon">▤</span>
+        </header>
+        <p class="market-description">
+          Cantidades sumadas para los alimentos registrados en tu plan.
+        </p>
+        <div class="progress-label">
+          <span>{{ completados() }} de {{ listaMercado().length }} listos</span
+          ><strong>{{ progresoMercado() }}%</strong>
+        </div>
+        <div class="progress-track"><span [style.width.%]="progresoMercado()"></span></div>
+        <div class="market-list">
+          @for (item of listaMercado(); track item.clave) {
+            <label class="market-item" [class.checked]="isChecked(item)"
+              ><input
+                type="checkbox"
+                [checked]="isChecked(item)"
+                (change)="toggleItem(item)"
+              /><span class="checkmark"></span
+              ><span class="market-food"
+                >{{ item.alimento }}<small>{{ item.cantidad }} {{ item.unidad }}</small></span
+              ></label
+            >
+          } @empty {
+            <p class="market-empty">Tu lista aparecerá cuando tengas alimentos en el plan.</p>
+          }
+        </div>
+        <p class="market-foot">Tu avance se guarda en este dispositivo.</p>
+      </aside>
+    </div>
+    <footer class="page-foot">
+      <span>Los cambios del plan los realiza tu nutricionista.</span
+      ><span>Actualizado {{ formatDate(planActual.actualizado) }}</span>
+    </footer>
+  } @else {
+    <section class="no-plan">
+      <span class="empty-icon">▤</span>
+      <h2>Aún no tienes un plan entregado</h2>
+      <p>Cuando tu nutricionista te comparta un plan, aparecerá en esta sección.</p>
+      <a routerLink="/inicio">Volver al resumen</a>
+    </section>
+  }
+</main>

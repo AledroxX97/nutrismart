@@ -1,0 +1,157 @@
+<main class="users-page">
+  <div class="back-row">
+    <a routerLink="/inicio">← Resumen</a
+    ><span>Administrador <span class="crumb">/</span> Usuarios y roles</span>
+  </div>
+  <ns-page-heading
+    title="Usuarios y roles"
+    description="Administra las cuentas y los perfiles de acceso de NutriSmart+."
+  >
+    <button class="primary-button" type="button" (click)="openCreate()">
+      <span>＋</span> Nuevo usuario
+    </button>
+  </ns-page-heading>
+
+  <section class="metric-grid" aria-label="Resumen de usuarios">
+    <ns-metric-card
+      label="Usuarios registrados"
+      [value]="usuarios().length.toString()"
+      hint="Cuentas creadas"
+      icon="♙"
+    />
+    <ns-metric-card
+      label="Cuentas activas"
+      [value]="totalActivos().toString()"
+      hint="Con acceso habilitado"
+      icon="✓"
+    />
+    <ns-metric-card
+      label="Administradores activos"
+      [value]="administradoresActivos().toString()"
+      hint="Acceso de administración"
+      icon="✦"
+    />
+  </section>
+
+  @if (mensaje() && !formularioAbierto()) {
+    <div class="page-alert" role="alert"><span>!</span>{{ mensaje() }}</div>
+  }
+
+  <section class="users-card">
+    <header class="list-heading">
+      <div>
+        <h2>Cuentas de usuario</h2>
+        <p>Consulta el perfil asignado y el estado de cada cuenta.</p>
+      </div>
+    </header>
+    <div class="filters" role="group" aria-label="Filtrar por estado">
+      <button
+        type="button"
+        [class.selected]="filtro() === 'ACTIVOS'"
+        (click)="setFilter('ACTIVOS')"
+      >
+        Activos <span>{{ totalActivos() }}</span>
+      </button>
+      <button
+        type="button"
+        [class.selected]="filtro() === 'INACTIVOS'"
+        (click)="setFilter('INACTIVOS')"
+      >
+        Inactivos <span>{{ totalInactivos() }}</span>
+      </button>
+      <button type="button" [class.selected]="filtro() === 'TODOS'" (click)="setFilter('TODOS')">
+        Todos <span>{{ usuarios().length }}</span>
+      </button>
+    </div>
+
+    <ns-data-table
+      [rows]="filteredUsers()"
+      [columns]="userColumns"
+      [actions]="userActions"
+      searchPlaceholder="Buscar por nombre, correo o rol"
+      [emptyMessage]="'No encontramos usuarios con los filtros seleccionados.'"
+      (actionSelected)="onTableAction($event)"
+    />
+  </section>
+
+  @if (formularioAbierto()) {
+    <div class="modal-backdrop">
+      <section class="form-panel" role="dialog" aria-modal="true" aria-labelledby="user-form-title">
+        <header class="form-heading">
+          <div>
+            <span class="eyebrow">GESTIÓN DE ACCESO</span>
+            <h2 id="user-form-title">
+              {{ usuarioEditado() ? 'Editar usuario' : 'Registrar usuario' }}
+            </h2>
+            <p>Completa los datos básicos y asigna un rol.</p>
+          </div>
+          <button
+            class="close-button"
+            type="button"
+            aria-label="Cerrar formulario"
+            (click)="closeForm()"
+          >
+            ×
+          </button>
+        </header>
+        <form [formGroup]="form" (ngSubmit)="saveUser()" novalidate>
+          <label
+            >Nombre completo *<input
+              type="text"
+              formControlName="nombre"
+              maxlength="120"
+              autocomplete="name"
+              placeholder="Ej. Laura Mejía"
+            />
+            @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+              <small class="field-error">Ingresa un nombre de al menos 2 caracteres.</small>
+            }
+          </label>
+          <label
+            >Correo electrónico *<input
+              type="email"
+              formControlName="correo"
+              maxlength="254"
+              autocomplete="email"
+              placeholder="nombre@correo.com"
+            />
+            @if (form.controls.correo.touched && form.controls.correo.invalid) {
+              <small class="field-error">Ingresa un correo electrónico válido.</small>
+            }
+          </label>
+          <label
+            >Rol de acceso *<select formControlName="rol">
+              @for (rol of roles; track rol) {
+                <option [value]="rol">{{ rol }}</option>
+              }</select
+            ><small>El rol determina los módulos y acciones disponibles.</small></label
+          >
+          @if (mensaje()) {
+            <p class="form-error" role="alert">{{ mensaje() }}</p>
+          }
+          <footer class="form-actions">
+            <button type="button" class="secondary-button" (click)="closeForm()">Cancelar</button
+            ><button type="submit" class="primary-button">
+              {{ usuarioEditado() ? 'Guardar cambios' : 'Crear usuario' }}
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+
+  <ns-confirm-dialog
+    [visible]="!!usuarioPendiente()"
+    [title]="usuarioPendiente()?.estado ? 'Desactivar usuario' : 'Activar usuario'"
+    [message]="
+      (usuarioPendiente()?.estado
+        ? 'Se desactivará la cuenta de '
+        : 'Se habilitará la cuenta de ') +
+      (usuarioPendiente()?.nombre ?? '') +
+      '.'
+    "
+    [confirmLabel]="usuarioPendiente()?.estado ? 'Desactivar' : 'Activar'"
+    (confirmed)="confirmStatusChange()"
+    (dismissed)="usuarioPendiente.set(null)"
+  />
+</main>

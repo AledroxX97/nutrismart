@@ -1,0 +1,171 @@
+<main class="detail-page">
+  <div class="back-row">
+    <a routerLink="/modulo/pacientes">← Volver a pacientes</a
+    ><span
+      >Nutricionista <span class="crumb">/</span> Pacientes <span class="crumb">/</span> Ficha
+      clínica</span
+    >
+  </div>
+
+  @if (patient(); as person) {
+    <ns-page-heading
+      [title]="fullName(person)"
+      description="Antecedentes, restricciones, objetivos nutricionales y controles antropométricos."
+    >
+      <span class="patient-code">PT-{{ person.id.toString().padStart(5, '0') }}</span>
+    </ns-page-heading>
+
+    <section class="profile-card">
+      <div class="profile-avatar">
+        {{ person.nombres.slice(0, 1) }}{{ person.apellidos.slice(0, 1) }}
+      </div>
+      <div class="profile-main">
+        <span class="eyebrow">RESUMEN DEL PACIENTE</span>
+        <h2>
+          {{ age(person.fecha_nacimiento) }} años <span>·</span>
+          {{ person.sexo || 'Sexo no indicado' }}
+        </h2>
+        <p>
+          {{ person.zona === 'RURAL' ? 'Zona rural' : 'Zona urbana' }} · Estrato
+          {{ person.estrato ?? 'Sin dato' }} · Presupuesto
+          {{ money(person.presupuesto_semanal_cop) }}
+        </p>
+      </div>
+    </section>
+
+    <section class="detail-grid">
+      <article class="detail-card conditions-card">
+        <header>
+          <div>
+            <span class="section-kicker">01 · ANTECEDENTES</span>
+            <h2>Condiciones médicas</h2>
+            <p>Información reportada para tener en cuenta en el acompañamiento.</p>
+          </div>
+          <button type="button" class="add-button" (click)="addCondition()">＋ Agregar</button>
+        </header>
+        @if (detail().condiciones.length) {
+          <ul class="entry-list">
+            @for (condition of detail().condiciones; track condition.id) {
+              <li>
+                <span class="entry-icon">＋</span>
+                <div>
+                  <strong>{{ condition.nombre }}</strong>
+                  <p>{{ condition.observaciones || 'Sin observaciones registradas.' }}</p>
+                </div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="empty-inline">No hay condiciones médicas registradas.</div>
+        }
+      </article>
+
+      <article class="detail-card restrictions-card">
+        <header>
+          <div>
+            <span class="section-kicker">02 · ALIMENTACIÓN</span>
+            <h2>Restricciones y preferencias</h2>
+            <p>Consideraciones alimentarias del paciente.</p>
+          </div>
+          <button type="button" class="add-button" (click)="addRestriction()">＋ Agregar</button>
+        </header>
+        @if (detail().restricciones.length) {
+          <ul class="entry-list">
+            @for (restriction of detail().restricciones; track restriction.id) {
+              <li>
+                <span class="entry-icon restriction-icon">◈</span>
+                <div>
+                  <strong
+                    >{{ restriction.nombre }}
+                    <span class="tag" [class.hard-tag]="restriction.tipo === 'DURA'">{{
+                      restriction.tipo === 'DURA' ? 'Estricto' : 'Preferencia'
+                    }}</span></strong
+                  >
+                  <p>{{ restriction.motivo || 'Sin motivo registrado.' }}</p>
+                </div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="empty-inline">No hay restricciones ni preferencias registradas.</div>
+        }
+      </article>
+
+      <article class="detail-card objective-card">
+        <header>
+          <div>
+            <span class="section-kicker">03 · PLANIFICACIÓN</span>
+            <h2>Objetivo nutricional</h2>
+            <p>Meta de acompañamiento actualmente definida.</p>
+          </div>
+          <button type="button" class="add-button" (click)="editObjective()">
+            {{
+              detail().objetivo
+                ? 'Editar'
+                : '＋
+          Definir'
+            }}
+          </button>
+        </header>
+        @if (detail().objetivo; as objective) {
+          <div class="objective-content">
+            <span class="objective-icon">◎</span>
+            <div>
+              <strong>{{ objective.tipo }}</strong>
+              <p>{{ objective.descripcion || 'Sin descripción.' }}</p>
+              <div class="target">
+                <span>META</span>{{ objective.meta_cuantificable || 'Pendiente de definir' }}
+              </div>
+              <small>Desde {{ date(objective.fecha_inicio) }}</small>
+            </div>
+          </div>
+        } @else {
+          <div class="empty-inline">Aún no se ha definido un objetivo nutricional.</div>
+        }
+      </article>
+
+      <article class="detail-card controls-card">
+        <header>
+          <div>
+            <span class="section-kicker">04 · SEGUIMIENTO</span>
+            <h2>Controles antropométricos</h2>
+            <p>Registro de medidas corporales y evolución.</p>
+          </div>
+          <button type="button" class="add-button" (click)="addControl()">
+            ＋ Registrar control
+          </button>
+        </header>
+        @if (latestControl(); as latest) {
+          <div class="latest-metrics">
+            <div>
+              <span>ÚLTIMO PESO</span><strong>{{ latest.peso_kg }} <small>kg</small></strong
+              ><small>{{ date(latest.fecha_control) }}</small>
+            </div>
+            <div>
+              <span>ESTATURA</span><strong>{{ latest.estatura_cm }} <small>cm</small></strong
+              ><small>Registro más reciente</small>
+            </div>
+            <div>
+              <span>IMC CALCULADO</span><strong>{{ bmi(latest) | number: '1.1-1' }}</strong
+              ><small>Valor de referencia</small>
+            </div>
+          </div>
+          <ns-data-table
+            [rows]="detail().controles"
+            [columns]="controlColumns"
+            emptyMessage="Todavía no hay controles registrados."
+          />
+        } @else {
+          <div class="empty-inline">Todavía no hay controles registrados.</div>
+        }
+      </article>
+    </section>
+  } @else {
+    <section class="not-found">
+      <span>!</span>
+      <h1>Paciente no encontrado</h1>
+      <p>No fue posible encontrar este registro.</p>
+      <a routerLink="/modulo/pacientes">Regresar al listado</a>
+    </section>
+  }
+</main>

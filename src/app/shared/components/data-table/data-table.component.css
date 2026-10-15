@@ -1,0 +1,109 @@
+:host {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+.data-table {
+  min-width: 0;
+  max-width: 100%;
+  color: #34483d;
+}
+.table-search {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: min(100%, 24rem);
+  min-height: 2.7rem;
+  margin: 0 0 1rem auto;
+  padding: 0 0.8rem;
+  border: 1px solid #dce5df;
+  border-radius: 0.7rem;
+  background: #fff;
+  color: #829087;
+}
+.table-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #34483d;
+  font: inherit;
+}
+.table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.88rem;
+}
+th {
+  padding: 0.8rem 0.85rem;
+  border-bottom: 1px solid #e7ede9;
+  color: #738178;
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+td {
+  padding: 0.9rem 0.85rem;
+  border-bottom: 1px solid #edf1ee;
+  vertical-align: middle;
+}
+tbody tr:hover {
+  background: #f8fbf9;
+}
+.sort-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+.sort-button span {
+  color: #a0ada4;
+}
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+.row-actions button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #28714e;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.row-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.empty-cell {
+  padding: 2.5rem 1rem;
+  color: #738178;
+  text-align: center;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

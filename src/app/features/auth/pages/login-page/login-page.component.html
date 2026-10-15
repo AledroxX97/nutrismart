@@ -1,0 +1,86 @@
+<main class="login-page">
+  <section class="welcome-panel" aria-labelledby="welcome-title">
+    <ns-app-brand destination="/acceso" [light]="true" />
+    <div class="welcome-copy">
+      <span class="eyebrow">Cuidado nutricional, con contexto</span>
+      <h1 id="welcome-title">Cada proceso saludable empieza con una buena conversación.</h1>
+      <p>Un espacio para acompañar objetivos reales con recomendaciones cercanas a cada persona.</p>
+    </div>
+    <div class="welcome-note">
+      <span class="leaf">✳</span><span>Planes pensados para la vida cotidiana.</span>
+    </div>
+    <div class="decor decor-one"></div>
+    <div class="decor decor-two"></div>
+  </section>
+
+  <section class="login-panel" aria-labelledby="login-title">
+    <div class="login-card">
+      <h2 id="login-title">Bienvenido</h2>
+      <p class="login-intro">Ingresa con tu cuenta NutriSmart+.</p>
+
+      <form class="login-form" (ngSubmit)="enterDemo()">
+        <fieldset class="role-options">
+          <legend>Ingresar como</legend>
+          @for (role of roles; track role) {
+            <label class="role-option" [class.selected]="selectedRole() === role">
+              <input
+                type="radio"
+                name="role"
+                [value]="role"
+                [checked]="selectedRole() === role"
+                (change)="selectedRole.set(role)"
+              />
+              <span class="role-icon" aria-hidden="true">{{
+                role === 'administrador' ? '✦' : role === 'nutricionista' ? '＋' : '♡'
+              }}</span>
+              <span class="role-text"
+                ><strong>{{ roleLabels[role] }}</strong
+                ><small>{{
+                  role === 'administrador'
+                    ? 'Gestión de la plataforma'
+                    : role === 'nutricionista'
+                      ? 'Atención y seguimiento'
+                      : 'Tu proceso nutricional'
+                }}</small></span
+              >
+              <span class="radio-indicator" aria-hidden="true"></span>
+            </label>
+          }
+        </fieldset>
+
+        <label class="field-label" for="email">Correo electrónico</label>
+        <input
+          id="email"
+          class="text-input"
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          autocomplete="username"
+          placeholder="nombre@correo.com"
+          required
+        />
+
+        <label class="field-label" for="password">Contraseña</label>
+        <input
+          id="password"
+          class="text-input"
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          autocomplete="current-password"
+          placeholder="Ingresa tu contraseña"
+          required
+        />
+
+        @if (errorMessage()) {
+          <p class="login-error" role="alert">{{ errorMessage() }}</p>
+        }
+
+        <button class="enter-button" type="submit">
+          Iniciar sesión <span aria-hidden="true">→</span>
+        </button>
+      </form>
+    </div>
+    <ns-app-footer [compact]="true" />
+  </section>
+</main>

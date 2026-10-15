@@ -1,0 +1,13 @@
+<main class="module-page">
+  <a class="back-link" routerLink="/inicio">← Volver al resumen</a>
+  <section class="module-panel">
+    <div class="module-symbol">✳</div>
+    <span class="eyebrow">MÓDULO DE {{ session.roleLabel()?.toUpperCase() }}</span>
+    <h1>{{ module()?.label }}</h1>
+    <p>
+      Consulta y administra la información de {{ module()?.label?.toLowerCase() }} desde este
+      espacio de trabajo.
+    </p>
+    <button type="button" (click)="returnHome()">Regresar al resumen</button>
+  </section>
+</main>

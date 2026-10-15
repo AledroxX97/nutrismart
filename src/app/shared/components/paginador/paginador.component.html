@@ -1,0 +1,40 @@
+<nav class="paginador" aria-label="Paginación">
+  <span class="range">{{ firstItem() }}–{{ lastItem() }} de {{ totalItems() }}</span>
+  <label class="page-size"
+    >Filas por página
+    <select [value]="pageSize()" (change)="changePageSize($any($event.target).value)">
+      <option [value]="5">5</option>
+      <option [value]="10">10</option>
+      <option [value]="20">20</option>
+    </select>
+  </label>
+  <div class="page-buttons">
+    <button
+      type="button"
+      aria-label="Página anterior"
+      [disabled]="currentPage() === 0"
+      (click)="changePage(currentPage() - 1)"
+    >
+      ‹
+    </button>
+    @for (page of pages(); track page) {
+      <button
+        type="button"
+        [attr.aria-label]="'Página ' + (page + 1)"
+        [attr.aria-current]="currentPage() === page ? 'page' : null"
+        [class.current]="currentPage() === page"
+        (click)="changePage(page)"
+      >
+        {{ page + 1 }}
+      </button>
+    }
+    <button
+      type="button"
+      aria-label="Página siguiente"
+      [disabled]="currentPage() >= totalPages() - 1"
+      (click)="changePage(currentPage() + 1)"
+    >
+      ›
+    </button>
+  </div>
+</nav>

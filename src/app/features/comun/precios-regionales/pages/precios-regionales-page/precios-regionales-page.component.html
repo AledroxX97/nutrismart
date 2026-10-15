@@ -1,0 +1,181 @@
+<main class="prices-page">
+  <div class="back-row">
+    <a routerLink="/inicio">← Resumen</a
+    ><span>NutriSmart+ <span class="crumb">/</span> Precios regionales</span>
+  </div>
+  <ns-page-heading
+    title="Precios regionales"
+    description="Consulta y organiza precios de referencia por municipio para apoyar la planeación alimentaria."
+  >
+    <button class="primary-button" type="button" (click)="openCreate()">
+      <span>＋</span> Registrar precio
+    </button>
+  </ns-page-heading>
+  <div class="demo-note">
+    <span>i</span> Los precios precargados son datos simulados para la demostración académica.
+  </div>
+
+  <section class="metric-grid" aria-label="Resumen de precios regionales">
+    <ns-metric-card
+      label="Registros de precios"
+      [value]="precios().length.toString()"
+      hint="Histórico local"
+      icon="$"
+    />
+    <ns-metric-card
+      label="Registros activos"
+      [value]="totalActivos().toString()"
+      hint="Disponibles para consulta"
+      icon="✓"
+    />
+    <ns-metric-card
+      label="Municipios cubiertos"
+      [value]="totalMunicipios().toString()"
+      hint="En los ejemplos cargados"
+      icon="⌖"
+    />
+  </section>
+
+  <section class="prices-card">
+    <header class="list-heading">
+      <div>
+        <h2>Precios registrados</h2>
+        <p>Compara el valor reportado, su unidad y el lugar de referencia.</p>
+      </div>
+    </header>
+    <div class="toolbar">
+      <div class="filters" role="group" aria-label="Filtrar por estado">
+        <button
+          type="button"
+          [class.selected]="filtro() === 'ACTIVOS'"
+          (click)="setFilter('ACTIVOS')"
+        >
+          Activos <span>{{ totalActivos() }}</span>
+        </button>
+        <button
+          type="button"
+          [class.selected]="filtro() === 'INACTIVOS'"
+          (click)="setFilter('INACTIVOS')"
+        >
+          Inactivos <span>{{ totalInactivos() }}</span>
+        </button>
+        <button type="button" [class.selected]="filtro() === 'TODOS'" (click)="setFilter('TODOS')">
+          Todos <span>{{ precios().length }}</span>
+        </button>
+      </div>
+      <label class="region-filter"
+        >Departamento<select
+          [value]="departamentoFiltro()"
+          (change)="departamentoFiltro.set($any($event.target).value)"
+        >
+          <option value="TODOS">Todos</option>
+          @for (departamento of departamentos; track departamento) {
+            <option [value]="departamento">{{ departamento }}</option>
+          }
+        </select></label
+      >
+    </div>
+
+    <ns-data-table
+      [rows]="preciosFiltrados()"
+      [columns]="priceColumns"
+      [actions]="priceActions"
+      searchPlaceholder="Buscar alimento o municipio"
+      [emptyMessage]="'No encontramos precios con los filtros seleccionados.'"
+      (actionSelected)="onTableAction($event)"
+    />
+  </section>
+
+  @if (formularioAbierto()) {
+    <div class="modal-backdrop">
+      <section
+        class="form-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="price-form-title"
+      >
+        <header class="form-heading">
+          <div>
+            <span class="eyebrow">REFERENCIAS DE MERCADO</span>
+            <h2 id="price-form-title">
+              {{ precioEditado() ? 'Editar precio' : 'Registrar precio' }}
+            </h2>
+            <p>Indica el lugar, la unidad y la fecha del dato.</p>
+          </div>
+          <button
+            class="close-button"
+            type="button"
+            aria-label="Cerrar formulario"
+            (click)="closeForm()"
+          >
+            ×
+          </button>
+        </header>
+        <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+          <label class="wide-field"
+            >Alimento *<input
+              type="text"
+              formControlName="alimento"
+              maxlength="100"
+              placeholder="Ej. Arroz blanco"
+            />
+            @if (form.controls.alimento.touched && form.controls.alimento.invalid) {
+              <small class="field-error">Ingresa el nombre del alimento.</small>
+            }
+          </label>
+          <label
+            >Departamento *<select formControlName="departamento" (change)="onDepartamentoChange()">
+              @for (departamento of departamentos; track departamento) {
+                <option [value]="departamento">{{ departamento }}</option>
+              }
+            </select></label
+          >
+          <label
+            >Municipio *<select formControlName="municipio">
+              @for (municipio of municipiosDisponibles; track municipio) {
+                <option [value]="municipio">{{ municipio }}</option>
+              }
+            </select></label
+          >
+          <label
+            >Precio en COP *<input type="number" formControlName="precio" min="1" step="1"
+          /></label>
+          <label
+            >Unidad *<input
+              type="text"
+              formControlName="unidad"
+              maxlength="20"
+              placeholder="kg, libra, unidad..."
+          /></label>
+          <label>Fecha de consulta *<input type="date" formControlName="fechaConsulta" /></label>
+          <label
+            >Fuente del dato *<input
+              type="text"
+              formControlName="fuente"
+              maxlength="120"
+              placeholder="Mercado, tienda o fuente consultada"
+          /></label>
+          <footer class="form-actions">
+            <button type="button" class="secondary-button" (click)="closeForm()">Cancelar</button
+            ><button type="submit" class="primary-button">
+              {{ precioEditado() ? 'Guardar cambios' : 'Registrar precio' }}
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+
+  <ns-confirm-dialog
+    [visible]="!!precioPendiente()"
+    [title]="precioPendiente()?.estado ? 'Desactivar registro' : 'Activar registro'"
+    [message]="
+      (precioPendiente()?.estado ? 'El registro de ' : 'Se activará el registro de ') +
+      (precioPendiente()?.alimento ?? '') +
+      (precioPendiente()?.estado ? ' dejará de aparecer entre los precios activos.' : '.')
+    "
+    [confirmLabel]="precioPendiente()?.estado ? 'Desactivar' : 'Activar'"
+    (confirmed)="confirmStatusChange()"
+    (dismissed)="precioPendiente.set(null)"
+  />
+</main>

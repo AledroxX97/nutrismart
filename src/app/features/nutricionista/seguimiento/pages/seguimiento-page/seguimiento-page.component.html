@@ -1,0 +1,218 @@
+<main class="followup-page">
+  <div class="back-row"><a routerLink="/inicio">← Resumen</a><span>Nutricionista <span class="crumb">/</span>
+      Seguimiento</span></div>
+  <ns-page-heading title="Seguimiento de pacientes"
+    description="Revisa la evolución, los reportes de adherencia y los próximos pasos de cada paciente.">
+    @if (selectedPatient()) {<div class="heading-actions"><button type="button" class="secondary-button"
+        (click)="openNoteForm()">＋ Nota de seguimiento</button><button type="button" class="primary-button"
+        (click)="openControlForm()">＋ Registrar control</button></div>}
+  </ns-page-heading>
+
+  <section class="summary-strip" aria-label="Resumen de seguimiento">
+    <article><span class="summary-icon green">◎</span>
+      <div><small>Pacientes activos</small><strong>{{ patients().length }}</strong></div>
+    </article>
+    <article><span class="summary-icon blue">↗</span>
+      <div><small>Buena adherencia</small><strong>{{ highAdherenceCount() }}</strong></div>
+    </article>
+    <article><span class="summary-icon amber">◷</span>
+      <div><small>Revisar esta semana</small><strong>{{ pendingFollowups() }}</strong></div>
+    </article>
+  </section>
+
+  <div class="followup-layout">
+    <aside class="patients-panel">
+      <header>
+        <div>
+          <h2>Mis pacientes</h2>
+          <p>Selecciona una ficha para revisar.</p>
+        </div><span class="patient-count">{{ patients().length }}</span>
+      </header>
+      <label class="patient-search"><span>⌕</span><input type="search" placeholder="Buscar paciente"
+          [value]="patientSearch()" (input)="patientSearch.set($any($event.target).value)" /></label>
+      <div class="patient-options">
+        @for (patient of patientsFiltered(); track patient.id) {
+        <button type="button" class="patient-option" [class.selected]="selectedPatientId() === patient.id"
+          (click)="selectPatient(patient.id)">
+          <span class="avatar">{{ initials(patient) }}</span><span class="patient-option-info"><strong>{{
+              fullName(patient) }}</strong><small>{{ detailFor(patient.id).controles.length }} controles
+              registrados</small></span>
+          @if (adherenceFor(patient.id); as report) {<span class="adherence-dot"
+            [class]="'adherence-dot ' + report.nivel.toLowerCase()"
+            [attr.aria-label]="adherenceLabel(report.nivel)"></span>}
+        </button>
+        } @empty {<div class="empty-small">No hay pacientes con ese nombre.</div>}
+      </div>
+      <footer class="patients-panel-footer">{{ patientsFiltered().length }} de {{ patients().length }} pacientes
+      </footer>
+    </aside>
+
+    @if (selectedPatient(); as patient) {
+    <section class="followup-main">
+      <article class="patient-banner">
+        <span class="avatar large-avatar">{{ initials(patient) }}</span>
+        <div class="patient-banner-info"><span class="eyebrow">FICHA DE SEGUIMIENTO</span>
+          <h2>{{ fullName(patient) }}</h2>
+          <p>{{ patient.fecha_nacimiento }} · {{ patient.zona === 'RURAL' ? 'Zona rural' : 'Zona urbana' }}</p>
+        </div>
+        <a class="open-profile" [routerLink]="['/modulo/pacientes', patient.id]">Ver ficha completa ↗</a>
+      </article>
+
+      <section class="control-section">
+        <header class="section-header">
+          <div><span class="eyebrow">EVOLUCIÓN ANTROPOMÉTRICA</span>
+            <h2>Controles nutricionales</h2>
+          </div><button type="button" class="small-add" (click)="openControlForm()">＋ Registrar</button>
+        </header>
+        @if (latestControl(); as latest) {
+        <div class="control-highlights">
+          <div><span>ÚLTIMO PESO</span><strong>{{ latest.peso_kg }} <small>kg</small></strong>
+            <p>{{ dateLabel(latest.fecha_control) }}</p>
+          </div>
+          <div><span>ESTATURA</span><strong>{{ latest.estatura_cm }} <small>cm</small></strong>
+            <p>Último dato registrado</p>
+          </div>
+          <div><span>IMC</span><strong>{{ bmi(latest.peso_kg, latest.estatura_cm) | number:'1.1-1' }}</strong>
+            <p>Valor de referencia</p>
+          </div>
+          <div><span>VARIACIÓN</span><strong class="variation" [class.positive]="(weightDifference() ?? 0) > 0"
+              [class.negative]="(weightDifference() ?? 0) < 0">{{ weightDifference() === null ? '—' :
+              (weightDifference()! > 0 ? '+' : '') + weightDifference() + ' kg' }}</strong>
+            <p>{{ weightTrend() }}</p>
+          </div>
+        </div>
+        <ns-data-table [rows]="patientDetail()?.controles ?? []" [columns]="controlColumns" emptyMessage="No hay controles registrados." />
+        } @else {<div class="empty-panel"><span>⌁</span><strong>Aún no hay controles registrados</strong>
+          <p>Registra peso, estatura y cintura para iniciar el seguimiento antropométrico.</p><button type="button"
+            class="small-add" (click)="openControlForm()">Registrar primer control</button>
+        </div>}
+      </section>
+
+      <section class="notes-section">
+        <header class="section-header">
+          <div><span class="eyebrow">CONTACTO PROFESIONAL</span>
+            <h2>Notas de seguimiento</h2>
+          </div><button type="button" class="small-add" (click)="openNoteForm()">＋ Agregar nota</button>
+        </header>
+        @if (notes().length) {<div class="timeline">@for (note of notes(); track note.id) {<article
+            class="timeline-entry"><span class="timeline-mark"
+              [class]="'timeline-mark ' + note.tipo.toLowerCase()"></span>
+            <div class="timeline-content">
+              <header><strong>{{ noteTypeLabel(note.tipo) }}</strong><time>{{ dateLabel(note.fecha) }}</time></header>
+              <p>{{ note.nota }}</p>@if (note.proximo_paso) {<div class="next-step"><span>PRÓXIMO PASO</span>
+                <p>{{ note.proximo_paso }}</p>
+              </div>}
+            </div>
+          </article>}</div>} @else {<div class="empty-panel compact-empty">No hay notas de seguimiento para este
+          paciente.</div>}
+      </section>
+    </section>
+
+    <aside class="followup-aside">
+      <article class="side-card adherence-card">
+        <header>
+          <div><span class="eyebrow">REPORTE DEL PACIENTE</span>
+            <h2>Adherencia al plan</h2>
+          </div><span class="report-icon">♡</span>
+        </header>
+        @if (adherence(); as report) {
+        <div class="adherence-score"><strong>{{ report.porcentaje }}<small>%</small></strong><span
+            class="adherence-level" [class]="'adherence-level ' + report.nivel.toLowerCase()">{{
+            adherenceLabel(report.nivel) }}</span></div>
+        <div class="progress-track"><span [style.width.%]="report.porcentaje"
+            [class]="'progress-fill ' + report.nivel.toLowerCase()"></span></div>
+        <p class="report-date">Último reporte · {{ dateLabel(report.fecha_reporte) }}</p>
+        <blockquote>{{ report.comentario }}</blockquote>
+        } @else {<div class="empty-inline">El paciente aún no ha enviado un reporte de adherencia.</div>}
+      </article>
+
+      <article class="side-card objective-card">
+        <header>
+          <div><span class="eyebrow">META ACTUAL</span>
+            <h2>Objetivo nutricional</h2>
+          </div><span class="target-icon">◎</span>
+        </header>
+        @if (patientDetail()?.objetivo; as objective) {<strong class="objective-name">{{ objective.tipo }}</strong>
+        <p>{{ objective.descripcion || 'Objetivo de acompañamiento.' }}</p>
+        <div class="objective-target"><span>META CUANTIFICABLE</span><strong>{{ objective.meta_cuantificable ||
+            'Pendiente de definir' }}</strong></div><small>Desde {{ dateLabel(objective.fecha_inicio) }}</small>} @else
+        {<div class="empty-inline">No hay un objetivo activo en la ficha.</div>}
+      </article>
+
+      <article class="side-card plan-card">
+        <header>
+          <div><span class="eyebrow">ALIMENTACIÓN</span>
+            <h2>Plan vigente</h2>
+          </div><span class="plan-icon">▤</span>
+        </header>
+        @if (activePlan(); as plan) {<strong class="objective-name">{{ plan.nombre }}</strong>
+        <p>{{ plan.detalles.length }} alimentos asignados · v{{ plan.numero_version }}</p><span class="plan-status"
+          [class]="'plan-status ' + plan.estado_plan.toLowerCase()">{{ plan.estado_plan === 'ENTREGADO' ? 'Entregado' :
+          plan.estado_plan === 'APROBADO' ? 'Aprobado' : 'Borrador' }}</span><a routerLink="/modulo/planes">Ver planes
+          →</a>} @else {<div class="empty-inline">No hay un plan registrado para este paciente.</div>}
+      </article>
+    </aside>
+    } @else {
+    <section class="no-patients"><span>♙</span>
+      <h2>No hay pacientes activos</h2>
+      <p>Registra un paciente para empezar el seguimiento.</p><a routerLink="/modulo/pacientes">Ir a pacientes</a>
+    </section>
+    }
+  </div>
+
+  @if (controlFormOpen() && selectedPatient(); as patient) {
+  <div class="modal-backdrop">
+    <section class="form-panel" role="dialog" aria-modal="true" aria-labelledby="control-title">
+      <header class="form-heading">
+        <div><span class="eyebrow">{{ fullName(patient) }}</span>
+          <h2 id="control-title">Registrar control</h2>
+          <p>Ingresa las medidas tomadas en consulta.</p>
+        </div><button type="button" class="close-button" aria-label="Cerrar" (click)="closeForms()">×</button>
+      </header>
+      <form (ngSubmit)="saveControl()"><label>Fecha del control *<input type="date" [max]="todayValue"
+            [ngModel]="controlDate()" (ngModelChange)="controlDate.set($event)" name="controlDate" required /></label>
+        <div class="form-grid"><label>Peso (kg) *<input type="number" min="0.1" max="500" step="0.01"
+              [ngModel]="weight()" (ngModelChange)="weight.set(+$event)" name="weight" required
+              placeholder="Ej. 64.5" /></label><label>Estatura (cm) *<input type="number" min="30.1" max="250"
+              step="0.1" [ngModel]="height()" (ngModelChange)="height.set(+$event)" name="height" required
+              placeholder="Ej. 163" /></label></div>
+        <label>Cintura (cm)<input type="number" min="0.1" max="300" step="0.1" [ngModel]="waist()"
+            (ngModelChange)="waist.set($event === null || $event === '' ? null : +$event)" name="waist"
+            placeholder="Opcional" /></label>
+        <label>Observaciones<textarea rows="3" maxlength="2000" [ngModel]="controlNotes()"
+            (ngModelChange)="controlNotes.set($event)" name="controlNotes"
+            placeholder="Notas del control"></textarea></label>
+        @if (formError()) {<p class="form-error" role="alert">{{ formError() }}</p>}<footer class="form-actions"><button
+            type="button" class="secondary-button" (click)="closeForms()">Cancelar</button><button type="submit"
+            class="primary-button">Guardar control</button></footer>
+      </form>
+    </section>
+  </div>
+  }
+  @if (noteFormOpen() && selectedPatient(); as patient) {
+  <div class="modal-backdrop">
+    <section class="form-panel" role="dialog" aria-modal="true" aria-labelledby="note-title">
+      <header class="form-heading">
+        <div><span class="eyebrow">{{ fullName(patient) }}</span>
+          <h2 id="note-title">Nota de seguimiento</h2>
+          <p>Registra el contacto y el siguiente paso acordado.</p>
+        </div><button type="button" class="close-button" aria-label="Cerrar" (click)="closeForms()">×</button>
+      </header>
+      <form (ngSubmit)="saveNote()"><label>Tipo de registro<select [ngModel]="noteType()"
+            (ngModelChange)="noteType.set($event)" name="noteType">
+            <option value="CONTACTO">Contacto</option>
+            <option value="CONSULTA">Consulta</option>
+            <option value="OBSERVACION">Observación</option>
+          </select></label><label>Nota *<textarea rows="4" minlength="5" maxlength="2000" [ngModel]="noteText()"
+            (ngModelChange)="noteText.set($event)" name="noteText" required
+            placeholder="¿Qué se revisó o conversó?"></textarea></label><label>Próximo paso<textarea rows="2"
+            maxlength="500" [ngModel]="nextStep()" (ngModelChange)="nextStep.set($event)" name="nextStep"
+            placeholder="Acuerdo o acción para el siguiente contacto"></textarea></label>
+        @if (formError()) {<p class="form-error" role="alert">{{ formError() }}</p>}<footer class="form-actions"><button
+            type="button" class="secondary-button" (click)="closeForms()">Cancelar</button><button type="submit"
+            class="primary-button">Guardar nota</button></footer>
+      </form>
+    </section>
+  </div>
+  }
+</main>

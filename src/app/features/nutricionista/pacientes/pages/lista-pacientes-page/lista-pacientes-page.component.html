@@ -1,0 +1,264 @@
+<main class="patients-page">
+  <div class="back-row">
+    <a routerLink="/inicio">← Resumen</a
+    ><span>Nutricionista <span class="crumb">/</span> Pacientes</span>
+  </div>
+
+  <ns-page-heading
+    title="Mis pacientes"
+    description="Administra la información básica y el consentimiento de las personas a tu cargo."
+  >
+    <button class="primary-button" type="button" (click)="openCreate()">
+      <span>＋</span> Nuevo paciente
+    </button>
+  </ns-page-heading>
+
+  <section class="metric-grid" aria-label="Resumen de pacientes">
+    <ns-metric-card
+      label="Pacientes activos"
+      [value]="activeCount().toString()"
+      hint="En seguimiento"
+      icon="♙"
+    />
+    <ns-metric-card
+      label="Menores de edad"
+      [value]="minorCount().toString()"
+      hint="Consentimiento de representante"
+      icon="♡"
+    />
+    <ns-metric-card
+      label="Registros inactivos"
+      [value]="inactiveCount().toString()"
+      hint="Conservados en el historial"
+      icon="◷"
+    />
+  </section>
+
+  <section class="list-card">
+    <div class="list-toolbar">
+      <div>
+        <h2>Listado de pacientes</h2>
+        <p>Los cambios se guardan localmente en este navegador.</p>
+      </div>
+    </div>
+    <div class="filters" role="group" aria-label="Filtrar pacientes">
+      <button
+        type="button"
+        [class.selected]="statusFilter() === 'ACTIVOS'"
+        (click)="setFilter('ACTIVOS')"
+      >
+        Activos <span>{{ activeCount() }}</span>
+      </button>
+      <button
+        type="button"
+        [class.selected]="statusFilter() === 'INACTIVOS'"
+        (click)="setFilter('INACTIVOS')"
+      >
+        Inactivos <span>{{ inactiveCount() }}</span>
+      </button>
+      <button
+        type="button"
+        [class.selected]="statusFilter() === 'TODOS'"
+        (click)="setFilter('TODOS')"
+      >
+        Todos <span>{{ patients().length }}</span>
+      </button>
+    </div>
+
+    <ns-data-table
+      [rows]="filteredPatients()"
+      [columns]="patientColumns"
+      [actions]="patientActions"
+      searchPlaceholder="Buscar por nombre o municipio"
+      emptyMessage="No encontramos pacientes con los filtros seleccionados."
+      (actionSelected)="onTableAction($event)"
+    />
+  </section>
+
+  @if (formOpen()) {
+    <div class="form-backdrop">
+      <section
+        class="patient-form-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="patient-form-title"
+      >
+        <header class="form-heading">
+          <div>
+            <span class="eyebrow">FICHA DE PACIENTE</span>
+            <h2 id="patient-form-title">
+              {{ editingPatient() ? 'Editar paciente' : 'Registrar paciente' }}
+            </h2>
+            <p>Los campos marcados con * son obligatorios.</p>
+          </div>
+          <button
+            class="close-button"
+            type="button"
+            aria-label="Cerrar formulario"
+            (click)="closeForm()"
+          >
+            ×
+          </button>
+        </header>
+        <form [formGroup]="form" (ngSubmit)="savePatient()" novalidate>
+          <div class="form-section-title"><span>01</span><strong>Información personal</strong></div>
+          <div class="form-grid">
+            <label>
+              Nombres *<input
+                type="text"
+                formControlName="nombres"
+                maxlength="100"
+                autocomplete="given-name"
+                placeholder="Ej. Laura Sofía"
+              />
+              @if (form.controls.nombres.touched && form.controls.nombres.invalid) {
+                <small class="field-error">Ingresa los nombres (máximo 100 caracteres).</small>
+              }
+            </label>
+            <label>
+              Apellidos *<input
+                type="text"
+                formControlName="apellidos"
+                maxlength="100"
+                autocomplete="family-name"
+                placeholder="Ej. Martínez Rojas"
+              />
+              @if (form.controls.apellidos.touched && form.controls.apellidos.invalid) {
+                <small class="field-error">Ingresa los apellidos (máximo 100 caracteres).</small>
+              }
+            </label>
+            <label
+              >Fecha de nacimiento *<input
+                type="date"
+                formControlName="fecha_nacimiento"
+                [max]="today"
+              />
+              @if (
+                form.controls.fecha_nacimiento.touched && form.controls.fecha_nacimiento.invalid
+              ) {
+                <small class="field-error">Selecciona una fecha válida.</small>
+              }
+            </label>
+            <label
+              >Sexo (opcional)<select formControlName="sexo">
+                <option value="">Prefiero no indicarlo</option>
+                <option value="FEMENINO">Femenino</option>
+                <option value="MASCULINO">Masculino</option>
+                <option value="INTERSEXUAL">Intersexual</option>
+              </select></label
+            >
+          </div>
+
+          <div class="form-section-title">
+            <span>02</span><strong>Contexto regional y económico</strong>
+          </div>
+          <div class="form-grid">
+            <label
+              >Municipio *<select formControlName="municipio_divipola">
+                <option value="">Selecciona un municipio</option>
+                @for (municipality of municipalities; track municipality.codigo) {
+                  <option [value]="municipality.codigo">{{ municipality.nombre }}</option>
+                }
+              </select>
+              @if (
+                form.controls.municipio_divipola.touched && form.controls.municipio_divipola.invalid
+              ) {
+                <small class="field-error">Selecciona un municipio de la lista.</small>
+              }
+            </label>
+            <label
+              >Zona *<select formControlName="zona">
+                <option value="URBANA">Urbana</option>
+                <option value="RURAL">Rural</option>
+              </select></label
+            >
+            <label
+              >Estrato socioeconómico<select formControlName="estrato">
+                <option [ngValue]="null">Sin dato</option>
+                @for (level of [1, 2, 3, 4, 5, 6]; track level) {
+                  <option [ngValue]="level">Estrato {{ level }}</option>
+                }
+              </select></label
+            >
+            <label
+              >Presupuesto semanal (COP)<input
+                type="number"
+                formControlName="presupuesto_semanal_cop"
+                min="0"
+                step="1000"
+                placeholder="150000"
+              /><small class="field-hint">Presupuesto disponible para alimentación.</small></label
+            >
+          </div>
+
+          <div class="form-section-title">
+            <span>03</span><strong>Consentimiento informado</strong>
+          </div>
+          @if (isMinorForm()) {
+            <p class="minor-notice">
+              Al ser menor de edad, el consentimiento debe ser otorgado por su representante legal.
+            </p>
+          }
+          <div class="form-grid consent-grid">
+            <label
+              >Otorgado por *<input
+                type="text"
+                formControlName="consentimiento_otorgado_por"
+                maxlength="160"
+                placeholder="Nombre de quien otorga el consentimiento"
+              />
+              @if (
+                form.controls.consentimiento_otorgado_por.touched &&
+                form.controls.consentimiento_otorgado_por.invalid
+              ) {
+                <small class="field-error"
+                  >Ingresa el nombre de quien otorga el consentimiento.</small
+                >
+              }
+            </label>
+            <label
+              >Tipo de otorgante *<select formControlName="consentimiento_tipo_otorgante">
+                <option value="PACIENTE">Paciente</option>
+                <option value="REPRESENTANTE">Representante legal</option>
+              </select></label
+            >
+            <label
+              >Fecha de aceptación *<input
+                type="date"
+                formControlName="consentimiento_fecha"
+                [max]="today"
+            /></label>
+            <label>Versión del texto<input type="text" [value]="consentVersion" disabled /></label>
+          </div>
+          <label class="consent-check"
+            ><input type="checkbox" formControlName="consentimiento_aceptado" /><span
+              >Confirmo que el consentimiento informado fue otorgado y registrado.</span
+            ></label
+          >
+          @if (formError()) {
+            <p class="form-error" role="alert">{{ formError() }}</p>
+          }
+          <footer class="form-actions">
+            <button type="button" class="secondary-button" (click)="closeForm()">Cancelar</button
+            ><button type="submit" class="primary-button">
+              {{ editingPatient() ? 'Guardar cambios' : 'Registrar paciente' }}
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+
+  <ns-confirm-dialog
+    [visible]="!!patientToDeactivate()"
+    title="Dar de baja al paciente"
+    [message]="
+      'Se marcará como inactivo el registro de ' +
+      (patientToDeactivate() ? fullName(patientToDeactivate()!) : '') +
+      '. Se conservará en el historial.'
+    "
+    confirmLabel="Dar de baja"
+    (confirmed)="confirmDeactivate()"
+    (dismissed)="patientToDeactivate.set(null)"
+  />
+</main>

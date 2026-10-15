@@ -1,0 +1,404 @@
+<main class="plans-page">
+  <div class="back-row">
+    <a routerLink="/inicio">← Resumen</a
+    ><span>Nutricionista <span class="crumb">/</span> Planes alimentarios</span>
+  </div>
+  <ns-page-heading
+    title="Planes alimentarios"
+    description="Diseña y organiza planes personalizados para tus pacientes."
+  >
+    <button class="primary-button" type="button" (click)="openCreate()">
+      <span>＋</span> Nuevo plan
+    </button>
+  </ns-page-heading>
+
+  <section class="metric-grid" aria-label="Resumen de planes">
+    <article class="metric-card">
+      <span class="metric-icon green">▤</span>
+      <div>
+        <small>Planes registrados</small><strong>{{ plans().length }}</strong
+        ><span>De todos tus pacientes</span>
+      </div>
+    </article>
+    <article class="metric-card">
+      <span class="metric-icon amber">◷</span>
+      <div>
+        <small>Borradores</small><strong>{{ draftCount() }}</strong
+        ><span>Pendientes de revisión</span>
+      </div>
+    </article>
+    <article class="metric-card">
+      <span class="metric-icon blue">☷</span>
+      <div>
+        <small>Alimentos asignados</small><strong>{{ mealCount() }}</strong
+        ><span>En todos los planes</span>
+      </div>
+    </article>
+  </section>
+
+  <div class="plans-layout">
+    <section class="plan-list-card">
+      <div class="list-heading">
+        <div>
+          <h2>Planes</h2>
+          <p>Selecciona un plan para revisar su contenido.</p>
+        </div>
+        <span class="count-chip">{{ visiblePlans().length }}</span>
+      </div>
+      <label class="search-field"
+        ><span>⌕</span
+        ><input
+          type="search"
+          placeholder="Buscar por paciente o plan"
+          [value]="search()"
+          (input)="search.set($any($event.target).value)"
+      /></label>
+      <div class="status-filters">
+        <button
+          type="button"
+          [class.active]="statusFilter() === 'TODOS'"
+          (click)="statusFilter.set('TODOS')"
+        >
+          Todos</button
+        ><button
+          type="button"
+          [class.active]="statusFilter() === 'BORRADOR'"
+          (click)="statusFilter.set('BORRADOR')"
+        >
+          Borradores</button
+        ><button
+          type="button"
+          [class.active]="statusFilter() === 'ENTREGADO'"
+          (click)="statusFilter.set('ENTREGADO')"
+        >
+          Entregados
+        </button>
+      </div>
+      <div class="plan-list">
+        @for (plan of visiblePlans(); track plan.id) {
+          <button
+            type="button"
+            class="plan-list-item"
+            [class.selected]="selectedPlanId() === plan.id"
+            (click)="selectedPlanId.set(plan.id)"
+          >
+            <span class="plan-icon">▤</span
+            ><span class="plan-list-copy"
+              ><strong>{{ plan.nombre }}</strong
+              ><small>{{ patientNameById(plan.paciente_id) }}</small
+              ><span class="plan-list-meta"
+                >{{ countMeals(plan) }} alimentos · v{{ plan.numero_version }}</span
+              ></span
+            ><span class="status-pill" [class]="'status-pill ' + statusClass(plan.estado_plan)">{{
+              statusLabel(plan.estado_plan)
+            }}</span>
+          </button>
+        } @empty {
+          <div class="list-empty">
+            <span>▤</span><strong>No hay planes para mostrar</strong>
+            <p>Crea un plan o ajusta los filtros.</p>
+          </div>
+        }
+      </div>
+      <div class="list-footer">{{ plans().length }} planes en total</div>
+    </section>
+
+    @if (selectedPlan(); as plan) {
+      <section class="plan-detail">
+        <header class="detail-header">
+          <div>
+            <div class="title-line">
+              <span class="plan-icon large">▤</span>
+              <div>
+                <span class="eyebrow">PLAN NUTRICIONAL · VERSIÓN {{ plan.numero_version }}</span>
+                <h2>{{ plan.nombre }}</h2>
+              </div>
+            </div>
+            <p class="patient-link">
+              Paciente:
+              <a [routerLink]="['/modulo/pacientes', plan.paciente_id]">{{
+                patientNameById(plan.paciente_id)
+              }}</a>
+            </p>
+          </div>
+          <span
+            class="status-pill large-pill"
+            [class]="'status-pill large-pill ' + statusClass(plan.estado_plan)"
+            >{{ statusLabel(plan.estado_plan) }}</span
+          >
+        </header>
+        <div class="plan-summary">
+          <div>
+            <span>OBJETIVO ASOCIADO</span
+            ><strong>{{ plan.objetivo || 'Sin objetivo vinculado' }}</strong>
+          </div>
+          <div>
+            <span>ALIMENTOS / PORCIONES</span><strong>{{ plan.detalles.length }} elementos</strong>
+          </div>
+          <div><span>ESTRUCTURA</span><strong>7 días · 5 tiempos</strong></div>
+        </div>
+        @if (plan.notas) {
+          <div class="plan-notes">
+            <span>NOTAS DEL PLAN</span>
+            <p>{{ plan.notas }}</p>
+          </div>
+        }
+        <div class="weekly-heading">
+          <div>
+            <span class="eyebrow">DISTRIBUCIÓN SEMANAL</span>
+            <h3>Comidas y porciones</h3>
+          </div>
+          @if (plan.estado_plan === 'BORRADOR') {
+            <button type="button" class="add-button" (click)="openMealForm()">
+              ＋ Agregar alimento
+            </button>
+          }
+        </div>
+        <div class="days-grid">
+          @for (day of days; track day) {
+            <article class="day-card">
+              <header>
+                <strong>Día {{ day }}</strong
+                ><span
+                  >{{ mealsForDay(plan, day).length }}
+                  {{ mealsForDay(plan, day).length === 1 ? 'elemento' : 'elementos' }}</span
+                >
+              </header>
+              @if (mealsForDay(plan, day).length) {
+                @for (meal of mealsForDay(plan, day); track meal.id) {
+                  <div class="meal-item">
+                    <div class="meal-time">
+                      <span class="meal-dot"></span>{{ mealLabel(meal.tipo_comida) }}
+                    </div>
+                    <div class="food-row">
+                      <strong>{{ meal.alimento }}</strong
+                      ><span>{{ meal.cantidad }} {{ meal.unidad }}</span>
+                    </div>
+                    @if (plan.estado_plan === 'BORRADOR') {
+                      <button
+                        type="button"
+                        class="remove-meal"
+                        [attr.aria-label]="'Quitar ' + meal.alimento"
+                        (click)="removeMeal(plan.id, meal.id)"
+                      >
+                        ×
+                      </button>
+                    }
+                  </div>
+                }
+              } @else {
+                <div class="day-empty">Sin alimentos asignados</div>
+              }
+            </article>
+          }
+        </div>
+        <footer class="detail-actions">
+          <span>Los cambios se guardan automáticamente.</span>
+          @if (plan.estado_plan === 'BORRADOR') {
+            <button
+              type="button"
+              class="primary-button"
+              [disabled]="plan.detalles.length === 0"
+              (click)="advanceStatus(plan)"
+            >
+              Revisar y aprobar →
+            </button>
+          } @else if (plan.estado_plan === 'APROBADO') {
+            <button type="button" class="primary-button" (click)="advanceStatus(plan)">
+              Entregar al paciente →
+            </button>
+          } @else {
+            <span class="delivered-note">✓ Plan entregado</span>
+          }
+        </footer>
+      </section>
+    } @else {
+      <section class="plan-detail no-selection">
+        <span class="empty-illustration">▤</span>
+        <h2>Selecciona un plan</h2>
+        <p>El contenido y la distribución semanal aparecerán aquí.</p>
+        <button class="primary-button" type="button" (click)="openCreate()">Crear plan</button>
+      </section>
+    }
+  </div>
+
+  @if (createOpen()) {
+    <div class="modal-backdrop">
+      <section
+        class="form-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-plan-title"
+      >
+        <header class="form-heading">
+          <div>
+            <span class="eyebrow">PLANIFICACIÓN NUTRICIONAL</span>
+            <h2 id="create-plan-title">Nuevo plan alimentario</h2>
+            <p>Asocia un paciente y define el objetivo del plan.</p>
+          </div>
+          <button
+            class="close-button"
+            type="button"
+            aria-label="Cerrar"
+            (click)="createOpen.set(false)"
+          >
+            ×
+          </button>
+        </header>
+        <form (ngSubmit)="createPlan()" #createForm="ngForm">
+          <label
+            >Paciente *<select
+              required
+              [ngModel]="patientId()"
+              (ngModelChange)="selectPatient($event)"
+              name="patientId"
+            >
+              @for (patient of patients(); track patient.id) {
+                <option [ngValue]="patient.id">{{ patientName(patient) }}</option>
+              }
+            </select></label
+          >
+          <label
+            >Nombre del plan *<input
+              required
+              minlength="2"
+              maxlength="160"
+              [ngModel]="planName()"
+              (ngModelChange)="planName.set($event)"
+              name="planName"
+              placeholder="Ej. Plan de alimentación equilibrada"
+          /></label>
+          <label
+            >Objetivo nutricional<select
+              [ngModel]="objective()"
+              (ngModelChange)="objective.set($event)"
+              name="objective"
+            >
+              <option value="">Sin objetivo asociado</option>
+              @if (selectedPatient(); as patient) {
+                @if (objectiveForPatient(patient.id); as patientObjective) {
+                  <option [value]="patientObjective.tipo">{{ patientObjective.tipo }}</option>
+                }
+              }</select
+            ><small>Se carga desde el objetivo registrado en la ficha del paciente.</small></label
+          >
+          <label
+            >Notas para el plan<textarea
+              rows="3"
+              maxlength="2000"
+              [ngModel]="planNotes()"
+              (ngModelChange)="planNotes.set($event)"
+              name="planNotes"
+              placeholder="Indicaciones generales o consideraciones"
+            ></textarea>
+          </label>
+          @if (formError()) {
+            <p class="form-error" role="alert">{{ formError() }}</p>
+          }
+          <footer class="form-actions">
+            <button type="button" class="secondary-button" (click)="createOpen.set(false)">
+              Cancelar</button
+            ><button
+              type="submit"
+              class="primary-button"
+              [disabled]="!patients().length || createForm.invalid"
+            >
+              Crear plan
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+
+  @if (mealOpen()) {
+    <div class="modal-backdrop">
+      <section
+        class="form-panel meal-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-meal-title"
+      >
+        <header class="form-heading">
+          <div>
+            <span class="eyebrow">{{ selectedPlan()?.nombre }}</span>
+            <h2 id="add-meal-title">Agregar alimento</h2>
+            <p>Define el día, tiempo de comida y porción.</p>
+          </div>
+          <button
+            class="close-button"
+            type="button"
+            aria-label="Cerrar"
+            (click)="mealOpen.set(false)"
+          >
+            ×
+          </button>
+        </header>
+        <form (ngSubmit)="saveMeal()">
+          <div class="form-grid">
+            <label
+              >Día<select
+                [ngModel]="mealDay()"
+                (ngModelChange)="mealDay.set(+$event)"
+                name="mealDay"
+              >
+                @for (day of days; track day) {
+                  <option [ngValue]="day">Día {{ day }}</option>
+                }
+              </select></label
+            ><label
+              >Tiempo de comida<select
+                [ngModel]="mealType()"
+                (ngModelChange)="mealType.set($event)"
+                name="mealType"
+              >
+                @for (type of mealTypes; track type.value) {
+                  <option [value]="type.value">{{ type.label }}</option>
+                }
+              </select></label
+            >
+          </div>
+          <label
+            >Alimento<select
+              [ngModel]="foodName()"
+              (ngModelChange)="changeFood($event)"
+              name="foodName"
+            >
+              @for (food of foods; track food.nombre) {
+                <option [value]="food.nombre">{{ food.nombre }} · {{ food.categoria }}</option>
+              }
+            </select></label
+          >
+          <div class="form-grid">
+            <label
+              >Cantidad<input
+                type="number"
+                min="0.1"
+                step="0.1"
+                required
+                [ngModel]="quantity()"
+                (ngModelChange)="quantity.set(+$event)"
+                name="quantity" /></label
+            ><label
+              >Unidad<select [ngModel]="unit()" (ngModelChange)="unit.set($event)" name="unit">
+                <option value="g">g</option>
+                <option value="ml">ml</option>
+                <option value="unidad">unidad</option>
+                <option value="porción">porción</option>
+                <option value="taza">taza</option>
+              </select></label
+            >
+          </div>
+          @if (formError()) {
+            <p class="form-error" role="alert">{{ formError() }}</p>
+          }
+          <footer class="form-actions">
+            <button type="button" class="secondary-button" (click)="mealOpen.set(false)">
+              Cancelar</button
+            ><button type="submit" class="primary-button">Agregar al plan</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+</main>

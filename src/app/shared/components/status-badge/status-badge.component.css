@@ -1,0 +1,27 @@
+:host {
+  display: inline-flex;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.active {
+  background: #eaf4e8;
+  color: #3b7449;
+}
+.inactive {
+  background: #f0f1ef;
+  color: #79827c;
+}
+.dot {
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 50%;
+  background: currentColor;
+}

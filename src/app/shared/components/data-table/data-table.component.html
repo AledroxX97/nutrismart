@@ -1,0 +1,89 @@
+<section class="data-table">
+  <label class="table-search">
+    <span aria-hidden="true">⌕</span>
+    <input
+      type="search"
+      [placeholder]="searchPlaceholder()"
+      [value]="query()"
+      (input)="setQuery($any($event.target).value)"
+    />
+  </label>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          @for (column of columns(); track column.id) {
+            <th
+              [attr.aria-sort]="
+                sortColumn() === column.id
+                  ? sortDirection() === 'asc'
+                    ? 'ascending'
+                    : 'descending'
+                  : 'none'
+              "
+            >
+              @if (column.sortable !== false) {
+                <button type="button" class="sort-button" (click)="toggleSort(column)">
+                  {{ column.label
+                  }}<span aria-hidden="true">{{
+                    sortColumn() === column.id ? (sortDirection() === 'asc' ? ' ↑' : ' ↓') : ' ↕'
+                  }}</span>
+                </button>
+              } @else {
+                {{ column.label }}
+              }
+            </th>
+          }
+          @if (actions().length) {
+            <th><span class="visually-hidden">Acciones</span></th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of pageRows(); track rowKey()(row)) {
+          <tr>
+            @for (column of columns(); track column.id) {
+              <td>
+                @if (templateFor(column.id); as cell) {
+                  <ng-container *ngTemplateOutlet="cell.template; context: { $implicit: row }" />
+                } @else {
+                  {{ displayValue(column, row) }}
+                }
+              </td>
+            }
+            @if (actions().length) {
+              <td>
+                <div class="row-actions">
+                  @for (action of actions(); track action.id) {
+                    @if (!action.visible || action.visible(row)) {
+                      <button
+                        type="button"
+                        [disabled]="action.disabled?.(row)"
+                        (click)="runAction(action.id, row)"
+                      >
+                        {{ action.label(row) }}
+                      </button>
+                    }
+                  }
+                </div>
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr>
+            <td class="empty-cell" [attr.colspan]="columns().length + (actions().length ? 1 : 0)">
+              {{ emptyMessage() }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <ns-paginador
+    [totalItems]="sortedRows().length"
+    [currentPage]="safePage()"
+    [pageSize]="pageSize()"
+    (pageChange)="setPage($event)"
+    (pageSizeChange)="setPageSize($event)"
+  />
+</section>

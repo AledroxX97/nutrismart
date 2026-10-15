@@ -1,0 +1,29 @@
+<aside class="sidebar">
+  <ns-app-brand />
+  <div class="workspace-label">ESPACIO DE TRABAJO</div>
+  <nav aria-label="Navegación principal">
+    <a
+      class="nav-item"
+      routerLink="/inicio"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      ><span class="nav-icon">⌂</span><span>Resumen</span></a
+    >
+    @for (item of navigation(); track item.slug) {
+      <a class="nav-item" [routerLink]="['/modulo', item.slug]" routerLinkActive="active"
+        ><span class="nav-icon">{{ iconFor(item.icon) }}</span
+        ><span>{{ item.label }}</span
+        ><span class="nav-arrow">›</span></a
+      >
+    }
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="help-card">
+      <span class="help-dot">✳</span><strong>¿Necesitas ayuda?</strong
+      ><small>Consulta la guía de uso</small>
+    </div>
+    <button class="logout" type="button" (click)="changeProfile()">
+      <span>↪</span> Cambiar perfil
+    </button>
+  </div>
+</aside>

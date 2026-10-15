@@ -1,0 +1,21 @@
+@if (visible()) {
+  <div class="backdrop" (click)="dismissed.emit()" (keydown.escape)="dismissed.emit()">
+    <section
+      class="dialog"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="title()"
+      (click)="$event.stopPropagation()"
+    >
+      <span class="warning-icon">!</span>
+      <h2>{{ title() }}</h2>
+      <p>{{ message() }}</p>
+      <div class="dialog-actions">
+        <button class="cancel" type="button" (click)="dismissed.emit()">Cancelar</button
+        ><button class="confirm" type="button" (click)="confirmed.emit()">
+          {{ confirmLabel() }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

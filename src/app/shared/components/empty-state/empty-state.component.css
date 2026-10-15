@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  padding: 2.7rem 1rem;
+  color: #75837a;
+  text-align: center;
+}
+.empty-state > span {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  margin-bottom: 0.3rem;
+  border-radius: 0.8rem;
+  background: #f0f4ed;
+  color: #6f9272;
+  font-size: 1.2rem;
+}
+.empty-state strong {
+  color: #405449;
+  font-size: 0.82rem;
+}
+.empty-state p {
+  max-width: 22rem;
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}

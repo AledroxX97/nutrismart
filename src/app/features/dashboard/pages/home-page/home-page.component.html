@@ -1,0 +1,38 @@
+<main class="home-content">
+  <div class="welcome-row">
+    <div>
+      <span class="date-label">{{ dateLabel }}</span>
+      <h1>Buenos días, {{ firstName }} <span class="wave">✳</span></h1>
+      <p>{{ subtitle }}</p>
+    </div>
+  </div>
+  <section class="summary-banner">
+    <div>
+      <span class="banner-tag">{{ roleLabel.toUpperCase() }}</span>
+      <h2>{{ heroTitle }}</h2>
+      <p>{{ heroDescription }}</p>
+    </div>
+    <div class="banner-art" aria-hidden="true">
+      <span class="art-circle circle-a"></span><span class="art-circle circle-b"></span
+      ><span class="art-leaf">✳</span>
+    </div>
+  </section>
+  <div class="section-heading">
+    <div>
+      <h2>Tu espacio de trabajo</h2>
+      <p>Accede a los módulos disponibles para tu perfil.</p>
+    </div>
+    <span class="module-count">{{ navigation.length }} módulos</span>
+  </div>
+  <section class="module-grid" aria-label="Módulos disponibles">
+    @for (item of navigation; track item.slug; let index = $index) {
+      <a class="module-card" [routerLink]="['/modulo', item.slug]">
+        <span class="module-icon" [class]="'module-icon tone-' + index">{{
+          iconFor(item.icon)
+        }}</span
+        ><span class="module-arrow">↗</span><strong>{{ item.label }}</strong
+        ><small>{{ descriptionFor(item.slug) }}</small>
+      </a>
+    }
+  </section>
+</main>

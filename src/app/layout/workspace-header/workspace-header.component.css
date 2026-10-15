@@ -1,0 +1,64 @@
+:host {
+  display: block;
+}
+.topbar {
+  display: flex;
+  height: 4.2rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1.25rem, 3vw, 3rem);
+  border-bottom: 1px solid #e8ece6;
+  background: #fff;
+}
+.breadcrumb {
+  color: #859188;
+  font-size: 0.76rem;
+}
+.breadcrumb span {
+  margin: 0 0.45rem;
+  color: #c5ccc6;
+}
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.avatar {
+  display: grid;
+  width: 2.2rem;
+  height: 2.2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #dcebd7;
+  color: #356c4b;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+.user-copy {
+  display: grid;
+  gap: 0.14rem;
+}
+.user-copy strong {
+  color: #34463c;
+  font-size: 0.72rem;
+}
+.user-copy small {
+  color: #8b968e;
+  font-size: 0.65rem;
+}
+@media (max-width: 560px) {
+  .topbar {
+    height: 3.7rem;
+  }
+  .breadcrumb {
+    font-size: 0.68rem;
+  }
+  .user-copy {
+    display: none;
+  }
+}

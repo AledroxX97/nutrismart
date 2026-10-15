@@ -1,0 +1,59 @@
+:host {
+  display: block;
+}
+.paginador {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0 0;
+  color: #68766e;
+  font-size: 0.82rem;
+}
+.page-size,
+.page-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.page-size select,
+.page-buttons button {
+  min-height: 2rem;
+  border: 1px solid #dce5df;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #35483d;
+}
+.page-size select {
+  padding: 0 0.45rem;
+}
+.page-buttons button {
+  min-width: 2rem;
+  cursor: pointer;
+}
+.page-buttons button.current {
+  border-color: #24734f;
+  background: #e8f4ed;
+  color: #17633f;
+  font-weight: 700;
+}
+.page-buttons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+@media (max-width: 640px) {
+  .paginador {
+    flex-wrap: wrap;
+  }
+  .page-size,
+  .page-buttons {
+    max-width: 100%;
+  }
+  .page-buttons {
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+  }
+  .range {
+    width: 100%;
+  }
+}

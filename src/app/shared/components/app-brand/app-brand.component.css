@@ -1,0 +1,35 @@
+:host {
+  display: inline-flex;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #1c4032;
+  text-decoration: none;
+  font-size: 1.06rem;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+.brand-mark {
+  display: grid;
+  width: 2.2rem;
+  height: 2.2rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: #e0edd5;
+  color: #286342;
+  font-size: 0.8rem;
+}
+.brand-plus {
+  color: #719b75;
+}
+.brand.light {
+  color: #f8f8f2;
+}
+.brand.light .brand-mark {
+  background: #d6e8bd;
+}
+.brand.light .brand-plus {
+  color: #c2dc9c;
+}

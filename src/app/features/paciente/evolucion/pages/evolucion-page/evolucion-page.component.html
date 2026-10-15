@@ -1,0 +1,208 @@
+<main class="evolution-page">
+  <div class="back-row">
+    <a routerLink="/inicio">← Resumen</a
+    ><span>Paciente <span class="crumb">/</span> Mi evolución</span>
+  </div>
+  <ns-page-heading
+    title="Mi evolución"
+    description="Consulta tus controles y revisa los avances que has registrado con tu nutricionista."
+  />
+
+  @if (paciente(); as persona) {
+    <section class="profile-strip">
+      <span class="profile-avatar">{{ persona.nombres[0] }}{{ persona.apellidos[0] }}</span>
+      <div>
+        <strong>{{ persona.nombres }} {{ persona.apellidos }}</strong
+        ><small>Historial de seguimiento nutricional</small>
+      </div>
+      <a routerLink="/modulo/mi-plan">Ver mi plan <span>→</span></a>
+    </section>
+
+    <section class="metric-grid" aria-label="Resumen de evolución">
+      <article class="metric-card">
+        <span class="metric-icon green">↗</span>
+        <div>
+          <small>Peso más reciente</small
+          ><strong>{{
+            ultimoControl() ? (ultimoControl()!.peso_kg | number: '1.1-1') + ' kg' : '—'
+          }}</strong
+          ><span>{{
+            ultimoControl()
+              ? dateLabel(ultimoControl()!.fecha_control)
+              : 'Sin controles registrados'
+          }}</span>
+        </div>
+      </article>
+      <article class="metric-card">
+        <span class="metric-icon blue">◉</span>
+        <div>
+          <small>IMC calculado</small><strong>{{ imc() ?? '—' }}</strong
+          ><span>Con el último control</span>
+        </div>
+      </article>
+      <article class="metric-card">
+        <span class="metric-icon amber">◷</span>
+        <div>
+          <small>Variación de peso</small
+          ><strong>{{
+            variacionPeso() === null
+              ? '—'
+              : (variacionPeso()! > 0 ? '+' : '') + variacionPeso() + ' kg'
+          }}</strong
+          ><span [class]="'variation ' + variationClass(variacionPeso())">{{
+            variationLabel(variacionPeso())
+          }}</span>
+        </div>
+      </article>
+    </section>
+
+    <div class="evolution-grid">
+      <section class="chart-card">
+        <header class="section-heading">
+          <div>
+            <span class="eyebrow">CONTROLES ANTROPOMÉTRICOS</span>
+            <h2>Registro de peso</h2>
+          </div>
+          <span class="chart-count"
+            >{{ controles().length }} {{ controles().length === 1 ? 'control' : 'controles' }}</span
+          >
+        </header>
+        @if (puntosGrafica().length) {
+          <div class="chart-legend">
+            <span class="legend-dot"></span>Peso registrado <strong>kg</strong>
+          </div>
+          <div class="chart-wrap">
+            <svg
+              viewBox="0 0 640 250"
+              role="img"
+              aria-label="Gráfica de los controles de peso registrados"
+            >
+              <line x1="48" y1="46" x2="608" y2="46" class="grid-line" />
+              <line x1="48" y1="117" x2="608" y2="117" class="grid-line" />
+              <line x1="48" y1="188" x2="608" y2="188" class="grid-line" />
+              <text x="8" y="50" class="axis-label">
+                {{ marcasGrafica()[0] | number: '1.1-1' }}
+              </text>
+              <text x="8" y="121" class="axis-label">
+                {{ marcasGrafica()[1] | number: '1.1-1' }}
+              </text>
+              <text x="8" y="192" class="axis-label">
+                {{ marcasGrafica()[2] | number: '1.1-1' }}
+              </text>
+              @if (puntosGrafica().length > 1) {
+                <polyline [attr.points]="lineaGrafica()" class="weight-line" />
+              }
+              @for (point of puntosGrafica(); track point.fecha) {
+                <circle [attr.cx]="point.x" [attr.cy]="point.y" r="6" class="weight-point">
+                  <title>{{ point.peso }} kg · {{ dateLabel(point.fecha) }}</title>
+                </circle>
+                <text [attr.x]="point.x" y="222" text-anchor="middle" class="date-label">
+                  {{ dateLabel(point.fecha) }}
+                </text>
+              }
+            </svg>
+          </div>
+          <p class="chart-note">
+            La gráfica muestra únicamente los valores registrados; no establece una meta de peso.
+          </p>
+        } @else {
+          <div class="chart-empty">
+            <span>↗</span><strong>Aún no tienes controles registrados</strong>
+            <p>Tu historial aparecerá aquí después de una consulta con tu nutricionista.</p>
+          </div>
+        }
+      </section>
+
+      <aside class="goal-card">
+        <header class="section-heading">
+          <div>
+            <span class="eyebrow">PROPÓSITO ACTUAL</span>
+            <h2>Tu objetivo</h2>
+          </div>
+          <span class="goal-icon">✳</span>
+        </header>
+        @if (objetivo(); as meta) {
+          <div class="goal-content">
+            <strong>{{ meta.tipo }}</strong>
+            <p>{{ meta.descripcion }}</p>
+            <div class="goal-target">
+              <span>META ACORDADA</span>
+              <p>{{ meta.meta_cuantificable }}</p>
+            </div>
+            <small>Desde {{ dateLabel(meta.fecha_inicio) }}</small>
+          </div>
+        } @else {
+          <div class="goal-empty">
+            <p>Aún no tienes un objetivo registrado.</p>
+            <span>Tu nutricionista podrá acordarlo contigo.</span>
+          </div>
+        }
+        @if (adherencia(); as reporte) {
+          <div class="adherence-box">
+            <div>
+              <span class="eyebrow">TU ÚLTIMO REPORTE</span
+              ><strong
+                >{{ reporte.porcentaje }}% <small>{{ adherenceLevel(reporte) }}</small></strong
+              >
+            </div>
+            <p>“{{ reporte.comentario }}”</p>
+            <small>{{ dateLabel(reporte.fecha_reporte) }}</small>
+          </div>
+        }
+      </aside>
+    </div>
+
+    <section class="history-card">
+      <header class="section-heading">
+        <div>
+          <span class="eyebrow">HISTORIAL</span>
+          <h2>Controles registrados</h2>
+        </div>
+        <span class="chart-count">{{ historialReciente().length }} registros</span>
+      </header>
+      @if (historialReciente().length) {
+        <div class="history-list">
+          @for (control of historialReciente(); track control.id) {
+            <article class="history-item">
+              <span class="timeline-dot"></span>
+              <div class="history-date">{{ dateLabel(control.fecha_control) }}</div>
+              <div class="history-values">
+                <span
+                  ><small>Peso</small
+                  ><strong>{{ control.peso_kg | number: '1.1-1' }} kg</strong></span
+                ><span
+                  ><small>Estatura</small><strong>{{ control.estatura_cm }} cm</strong></span
+                ><span
+                  ><small>IMC</small
+                  ><strong>{{
+                    control.peso_kg / ((control.estatura_cm / 100) * (control.estatura_cm / 100))
+                      | number: '1.1-1'
+                  }}</strong></span
+                >
+                @if (control.cintura_cm) {
+                  <span
+                    ><small>Cintura</small><strong>{{ control.cintura_cm }} cm</strong></span
+                  >
+                }
+              </div>
+              @if (control.observaciones) {
+                <p class="history-note">{{ control.observaciones }}</p>
+              }
+            </article>
+          }
+        </div>
+      } @else {
+        <p class="history-empty">Aún no hay controles para mostrar.</p>
+      }
+    </section>
+    <footer class="page-foot">
+      <span>El IMC es un cálculo de referencia basado en peso y estatura.</span
+      ><span>Los controles son registrados por tu nutricionista.</span>
+    </footer>
+  } @else {
+    <section class="chart-empty">
+      <strong>No encontramos el perfil del paciente.</strong
+      ><a routerLink="/inicio">Volver al resumen</a>
+    </section>
+  }
+</main>

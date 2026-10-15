@@ -1,0 +1,168 @@
+<main class="catalog-page">
+  <div class="back-row">
+    <a routerLink="/inicio">← Resumen</a
+    ><span>Administrador <span class="crumb">/</span> Catálogo de alimentos</span>
+  </div>
+  <ns-page-heading
+    title="Catálogo de alimentos"
+    description="Organiza los alimentos y sus valores nutricionales de referencia."
+  >
+    <button class="primary-button" type="button" (click)="openCreate()">
+      <span>＋</span> Agregar alimento
+    </button>
+  </ns-page-heading>
+
+  <section class="metric-grid" aria-label="Resumen del catálogo">
+    <ns-metric-card
+      label="Alimentos registrados"
+      [value]="alimentos().length.toString()"
+      hint="Elementos del catálogo"
+      icon="◒"
+    />
+    <ns-metric-card
+      label="Alimentos activos"
+      [value]="totalActivos().toString()"
+      hint="Disponibles para consulta"
+      icon="✓"
+    />
+    <ns-metric-card
+      label="Categorías activas"
+      [value]="totalCategorias().toString()"
+      hint="Organización del catálogo"
+      icon="▤"
+    />
+  </section>
+
+  <section class="catalog-card">
+    <header class="list-heading">
+      <div>
+        <h2>Alimentos</h2>
+        <p>
+          Valores por porción de referencia. Puedes ajustar los datos a la fuente que utilice el
+          proyecto.
+        </p>
+      </div>
+    </header>
+    <div class="filters" role="group" aria-label="Filtrar por estado">
+      <button
+        type="button"
+        [class.selected]="filtro() === 'ACTIVOS'"
+        (click)="setFilter('ACTIVOS')"
+      >
+        Activos <span>{{ totalActivos() }}</span>
+      </button>
+      <button
+        type="button"
+        [class.selected]="filtro() === 'INACTIVOS'"
+        (click)="setFilter('INACTIVOS')"
+      >
+        Inactivos <span>{{ totalInactivos() }}</span>
+      </button>
+      <button type="button" [class.selected]="filtro() === 'TODOS'" (click)="setFilter('TODOS')">
+        Todos <span>{{ alimentos().length }}</span>
+      </button>
+    </div>
+
+    <ns-data-table
+      [rows]="alimentosFiltrados()"
+      [columns]="foodColumns"
+      [actions]="foodActions"
+      searchPlaceholder="Buscar alimento o categoría"
+      [emptyMessage]="'No encontramos alimentos con los filtros seleccionados.'"
+      (actionSelected)="onTableAction($event)"
+    />
+  </section>
+
+  @if (formularioAbierto()) {
+    <div class="modal-backdrop">
+      <section class="form-panel" role="dialog" aria-modal="true" aria-labelledby="food-form-title">
+        <header class="form-heading">
+          <div>
+            <span class="eyebrow">CATÁLOGO NUTRICIONAL</span>
+            <h2 id="food-form-title">
+              {{ alimentoEditado() ? 'Editar alimento' : 'Agregar alimento' }}
+            </h2>
+            <p>Registra los valores correspondientes a una porción definida.</p>
+          </div>
+          <button
+            class="close-button"
+            type="button"
+            aria-label="Cerrar formulario"
+            (click)="closeForm()"
+          >
+            ×
+          </button>
+        </header>
+        <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+          <label class="wide-field"
+            >Nombre del alimento *<input
+              type="text"
+              formControlName="nombre"
+              maxlength="100"
+              placeholder="Ej. Fríjol cargamanto cocido"
+            />
+            @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+              <small class="field-error">Ingresa un nombre de al menos 2 caracteres.</small>
+            }
+          </label>
+          <label
+            >Categoría *<select formControlName="categoria">
+              @for (categoria of categorias; track categoria) {
+                <option [value]="categoria">{{ categoria }}</option>
+              }
+            </select></label
+          >
+          <label
+            >Porción de referencia *
+            <div class="unit-input">
+              <input type="number" formControlName="porcion" min="0.1" step="any" /><input
+                type="text"
+                formControlName="unidad"
+                maxlength="12"
+                aria-label="Unidad de la porción"
+              /></div
+          ></label>
+          <label
+            >Calorías (kcal) *<input type="number" formControlName="calorias" min="0" step="any"
+          /></label>
+          <label
+            >Proteína (g) *<input type="number" formControlName="proteinas" min="0" step="any"
+          /></label>
+          <label
+            >Carbohidratos (g) *<input
+              type="number"
+              formControlName="carbohidratos"
+              min="0"
+              step="any"
+          /></label>
+          <label
+            >Grasas (g) *<input type="number" formControlName="grasas" min="0" step="any"
+          /></label>
+          <p class="form-note">
+            Los datos iniciales son referencias de demostración. En la versión conectada se
+            documentará la fuente nutricional usada.
+          </p>
+          <footer class="form-actions">
+            <button type="button" class="secondary-button" (click)="closeForm()">Cancelar</button
+            ><button type="submit" class="primary-button">
+              {{ alimentoEditado() ? 'Guardar cambios' : 'Agregar alimento' }}
+            </button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+
+  <ns-confirm-dialog
+    [visible]="!!alimentoPendiente()"
+    [title]="alimentoPendiente()?.estado ? 'Desactivar alimento' : 'Activar alimento'"
+    [message]="
+      (alimentoPendiente()?.estado ? 'El alimento ' : 'Se habilitará el alimento ') +
+      (alimentoPendiente()?.nombre ?? '') +
+      (alimentoPendiente()?.estado ? ' dejará de aparecer entre las opciones activas.' : '.')
+    "
+    [confirmLabel]="alimentoPendiente()?.estado ? 'Desactivar' : 'Activar'"
+    (confirmed)="confirmStatusChange()"
+    (dismissed)="alimentoPendiente.set(null)"
+  />
+</main>

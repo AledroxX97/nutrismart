@@ -1,0 +1,9 @@
+<label class="search-box"
+  ><span aria-hidden="true">⌕</span
+  ><input
+    type="search"
+    [placeholder]="placeholder()"
+    [value]="value()"
+    (input)="valueChange.emit($any($event.target).value)"
+  /><kbd>⌘ K</kbd></label
+>

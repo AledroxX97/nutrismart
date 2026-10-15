@@ -1,0 +1,226 @@
+:host {
+  display: block;
+  color: #21362e;
+}
+.home-content {
+  max-width: 76rem;
+  margin: 0 auto;
+}
+.welcome-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.date-label {
+  color: #829087;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+}
+h1 {
+  margin: 0.5rem 0 0.35rem;
+  color: #1f392e;
+  font-size: clamp(1.7rem, 3vw, 2.25rem);
+  font-weight: 650;
+  letter-spacing: -0.05em;
+}
+.wave {
+  color: #81a875;
+  font-size: 1.2rem;
+}
+.welcome-row p {
+  margin: 0;
+  color: #7e8b82;
+  font-size: 0.84rem;
+}
+.summary-banner {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  min-height: 12rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.8rem 2rem;
+  border-radius: 1rem;
+  background: #e9f1e4;
+}
+.banner-tag {
+  color: #64846b;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+.summary-banner h2 {
+  max-width: 35rem;
+  margin: 0.65rem 0 0.4rem;
+  color: #294b39;
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+.summary-banner p {
+  max-width: 37rem;
+  margin: 0;
+  color: #62766a;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+.banner-art {
+  position: relative;
+  width: 9rem;
+  height: 9rem;
+  flex: 0 0 9rem;
+  margin-right: 2rem;
+}
+.art-circle {
+  position: absolute;
+  display: block;
+  border: 1px solid #a9c5a3;
+  border-radius: 50%;
+}
+.circle-a {
+  inset: 0.3rem;
+}
+.circle-b {
+  inset: 1.2rem;
+  background: #d9e8d1;
+}
+.art-leaf {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #6d966d;
+  font-size: 2.5rem;
+}
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin: 2rem 0 0.9rem;
+}
+.section-heading h2 {
+  margin: 0 0 0.3rem;
+  color: #2f4438;
+  font-size: 1.05rem;
+  letter-spacing: -0.025em;
+}
+.section-heading p {
+  margin: 0;
+  color: #839087;
+  font-size: 0.75rem;
+}
+.module-count {
+  color: #829087;
+  font-size: 0.7rem;
+}
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+.module-card {
+  position: relative;
+  display: grid;
+  min-height: 8.8rem;
+  align-content: start;
+  gap: 0.42rem;
+  padding: 1rem;
+  border: 1px solid #e7ece5;
+  border-radius: 0.85rem;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.16s,
+    box-shadow 0.16s,
+    transform 0.16s;
+}
+.module-card:hover {
+  transform: translateY(-2px);
+  border-color: #c3d7bd;
+  box-shadow: 0 8px 18px #294b390d;
+}
+.module-icon {
+  display: grid;
+  width: 2.3rem;
+  height: 2.3rem;
+  place-items: center;
+  margin-bottom: 0.3rem;
+  border-radius: 0.7rem;
+  background: #eaf3e5;
+  color: #407052;
+  font-size: 1.05rem;
+}
+.tone-1 {
+  background: #edf0e2;
+  color: #768445;
+}
+.tone-2 {
+  background: #f1ece2;
+  color: #927546;
+}
+.tone-3 {
+  background: #e9eff0;
+  color: #527a7a;
+}
+.tone-4 {
+  background: #f2eaf0;
+  color: #8b6381;
+}
+.module-card strong {
+  color: #34483d;
+  font-size: 0.78rem;
+}
+.module-card small {
+  max-width: 15rem;
+  color: #849087;
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+.module-arrow {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  color: #a0aba2;
+  font-size: 0.85rem;
+}
+.callout-icon {
+  display: grid;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 1.1rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #e4eee0;
+  color: #5f8564;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+@media (max-width: 1050px) {
+  .module-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .banner-art {
+    margin-right: 0;
+  }
+}
+@media (max-width: 760px) {
+  .summary-banner {
+    min-height: 10rem;
+    padding: 1.3rem;
+  }
+  .banner-art {
+    width: 5.5rem;
+    height: 5.5rem;
+    flex-basis: 5.5rem;
+  }
+  .module-grid {
+    grid-template-columns: 1fr;
+  }
+  .module-card {
+    min-height: 7.4rem;
+  }
+}

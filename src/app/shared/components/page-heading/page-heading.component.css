@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.35rem;
+}
+h1 {
+  margin: 0 0 0.3rem;
+  color: #1f392e;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+}
+p {
+  margin: 0;
+  color: #7e8b82;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+.actions {
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+@media (max-width: 600px) {
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

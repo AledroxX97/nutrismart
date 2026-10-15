@@ -1,0 +1,6 @@
+<footer class="app-footer" [class.compact]="compact()">
+  <span>NutriSmart+ <i>·</i> Plataforma de gestión nutricional</span>
+  @if (note()) {
+    <span class="note">{{ note() }}</span>
+  }
+</footer>

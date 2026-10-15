@@ -1,0 +1,212 @@
+<main class="appointments-page">
+  <div class="back-row">
+    <a routerLink="/inicio">← Resumen</a
+    ><span>Paciente <span class="crumb">/</span> Mis citas</span>
+  </div>
+  <ns-page-heading
+    title="Mis citas"
+    description="Consulta tus próximos espacios y revisa el historial de atención."
+  >
+    <button class="primary-button" type="button" (click)="openRequest()">
+      <span>＋</span> Solicitar cita
+    </button>
+  </ns-page-heading>
+
+  <section class="metric-grid" aria-label="Resumen de citas">
+    <article class="metric-card">
+      <span class="metric-icon green">▦</span>
+      <div>
+        <small>Próximas citas</small><strong>{{ proximas().length }}</strong
+        ><span>Programadas o reprogramadas</span>
+      </div>
+    </article>
+    <article class="metric-card">
+      <span class="metric-icon blue">✓</span>
+      <div>
+        <small>Consultas realizadas</small><strong>{{ realizadas().length }}</strong
+        ><span>En el historial local</span>
+      </div>
+    </article>
+    <article class="metric-card next-card">
+      <span class="metric-icon amber">◷</span>
+      <div>
+        <small>Siguiente cita</small
+        ><strong>{{ proximas().length ? formatDate(proximas()[0].inicio) : 'Sin cita' }}</strong
+        ><span>{{
+          proximas().length ? formatTime(proximas()[0].inicio) : 'Solicita un espacio'
+        }}</span>
+      </div>
+    </article>
+  </section>
+
+  <section class="appointments-card">
+    <header class="list-heading">
+      <div>
+        <span class="eyebrow">AGENDA PERSONAL</span>
+        <h2>Tu atención nutricional</h2>
+        <p>Las solicitudes se guardan localmente en este dispositivo.</p>
+      </div>
+      <button type="button" class="outline-button" (click)="openRequest()">
+        ＋ Nueva solicitud
+      </button>
+    </header>
+    <nav class="filters" aria-label="Filtrar citas">
+      <button
+        type="button"
+        [class.selected]="filtro() === 'PROXIMAS'"
+        (click)="setFilter('PROXIMAS')"
+      >
+        Próximas <span>{{ proximas().length }}</span></button
+      ><button
+        type="button"
+        [class.selected]="filtro() === 'HISTORIAL'"
+        (click)="setFilter('HISTORIAL')"
+      >
+        Historial</button
+      ><button type="button" [class.selected]="filtro() === 'TODAS'" (click)="setFilter('TODAS')">
+        Todas <span>{{ citas().length }}</span>
+      </button>
+    </nav>
+    @if (citasVisibles().length) {
+      <div class="appointment-list">
+        @for (cita of citasVisibles(); track cita.id) {
+          <article class="appointment-item">
+            <div class="date-block">
+              <strong>{{ dayNumber(cita.inicio) }}</strong
+              ><span>{{ monthLabel(cita.inicio) }}</span>
+            </div>
+            <div class="appointment-main">
+              <div class="appointment-title">
+                <h3>Consulta nutricional</h3>
+                <span [class]="'status-pill ' + cita.estado_cita.toLowerCase()">{{
+                  statusLabel(cita.estado_cita)
+                }}</span>
+              </div>
+              <div class="appointment-meta">
+                <span>▦ {{ formatDate(cita.inicio) }}</span
+                ><span>◷ {{ formatTime(cita.inicio) }} · 45 min</span>
+              </div>
+              <div class="appointment-nutritionist">
+                <span class="nutritionist-avatar">{{
+                  nutritionistInitials(cita.nutricionista_nombre)
+                }}</span
+                ><span
+                  ><small>Nutricionista</small
+                  ><strong>{{ cita.nutricionista_nombre }}</strong></span
+                >
+              </div>
+              @if (cita.motivo) {
+                <p class="appointment-reason">{{ cita.motivo }}</p>
+              }
+            </div>
+            @if (isUpcoming(cita)) {
+              <button class="cancel-action" type="button" (click)="askCancel(cita)">
+                Cancelar cita
+              </button>
+            }
+          </article>
+        }
+      </div>
+    } @else {
+      <ns-empty-state
+        title="No hay citas en esta sección"
+        description="Puedes solicitar una cita para coordinar tu próximo espacio de atención."
+      />
+    }
+    <footer class="table-foot">
+      <span>{{ citasVisibles().length }} citas visibles</span
+      ><span>Duración estimada: 45 minutos</span>
+    </footer>
+  </section>
+
+  @if (modalAbierto()) {
+    <div class="modal-backdrop">
+      <section
+        class="form-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="appointment-form-title"
+      >
+        <header class="form-heading">
+          <div>
+            <span class="eyebrow">SOLICITUD DE ATENCIÓN</span>
+            <h2 id="appointment-form-title">Solicitar una cita</h2>
+            <p>Elige un espacio disponible con tu nutricionista.</p>
+          </div>
+          <button
+            class="close-button"
+            type="button"
+            aria-label="Cerrar formulario"
+            (click)="closeRequest()"
+          >
+            ×
+          </button>
+        </header>
+        <form (ngSubmit)="requestAppointment()">
+          <label
+            >Nutricionista<select
+              [ngModel]="nutricionistaId()"
+              (ngModelChange)="nutricionistaId.set(+$event)"
+              name="nutritionist"
+            >
+              @for (nutricionista of nutricionistas; track nutricionista.id) {
+                <option [ngValue]="nutricionista.id">{{ nutricionista.nombre }}</option>
+              }
+            </select></label
+          >
+          <div class="form-grid">
+            <label
+              >Fecha<input
+                type="date"
+                [min]="hoy"
+                [ngModel]="fecha()"
+                (ngModelChange)="fecha.set($event)"
+                name="date"
+                required /></label
+            ><label
+              >Hora<select [ngModel]="hora()" (ngModelChange)="hora.set($event)" name="time">
+                @for (horario of horarios; track horario) {
+                  <option [value]="horario">{{ horario }}</option>
+                }
+              </select></label
+            >
+          </div>
+          <label
+            >Motivo de la consulta
+            <textarea
+              rows="3"
+              maxlength="1000"
+              [ngModel]="motivo()"
+              (ngModelChange)="motivo.set($event)"
+              name="reason"
+              placeholder="Cuéntanos brevemente qué te gustaría revisar"
+            ></textarea>
+          </label>
+          <p class="form-note">
+            La solicitud queda registrada en esta agenda local. La cita dura 45 minutos.
+          </p>
+          @if (errorFormulario()) {
+            <p class="form-error" role="alert">{{ errorFormulario() }}</p>
+          }
+          <footer class="form-actions">
+            <button type="button" class="secondary-button" (click)="closeRequest()">Volver</button
+            ><button type="submit" class="primary-button">Confirmar solicitud</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  }
+
+  <ns-confirm-dialog
+    [visible]="!!citaPendienteCancelar()"
+    title="Cancelar cita"
+    [message]="
+      'Se cancelará tu cita del ' +
+      (citaPendienteCancelar() ? formatDate(citaPendienteCancelar()!.inicio) : '') +
+      '. Esta acción actualizará el historial.'
+    "
+    confirmLabel="Cancelar cita"
+    (confirmed)="confirmCancel()"
+    (dismissed)="citaPendienteCancelar.set(null)"
+  />
+</main>

@@ -1,0 +1,427 @@
+.my-plan-page {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 28px 34px 48px;
+  color: #26352f;
+}
+.back-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  color: #84918a;
+  font-size: 13px;
+}
+.back-row a {
+  color: #32765c;
+  font-weight: 650;
+  text-decoration: none;
+}
+.crumb {
+  padding: 0 7px;
+  color: #c5cec8;
+}
+.welcome-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 20px 0 13px;
+  padding: 20px 22px;
+  border: 1px solid #e5ede6;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #f1f8f2, #fff);
+}
+.welcome-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border-radius: 14px;
+  background: #e2f0e5;
+  color: #57906a;
+  font-size: 23px;
+}
+.welcome-card > div:nth-child(2) {
+  flex: 1;
+}
+.eyebrow {
+  color: #779080;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+.welcome-card h2 {
+  margin: 5px 0;
+  color: #344a3b;
+  font-size: 17px;
+}
+.welcome-card p {
+  margin: 0;
+  color: #7e8b81;
+  font-size: 10px;
+}
+.welcome-card p span {
+  padding: 0 4px;
+  color: #b7c0b8;
+}
+.status-pill {
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: #e7f3e9;
+  color: #4f805d;
+  font-size: 10px;
+  font-weight: 750;
+}
+.plan-note {
+  padding: 12px 15px;
+  border-left: 3px solid #82aa88;
+  border-radius: 0 8px 8px 0;
+  background: #f8faf7;
+}
+.plan-note span {
+  color: #718575;
+  font-size: 9px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.plan-note p {
+  margin: 5px 0 0;
+  color: #5d6d61;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.8fr);
+  align-items: start;
+  gap: 16px;
+  margin-top: 17px;
+}
+.week-card,
+.market-card {
+  border: 1px solid #e8ede9;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 18px #233d2c08;
+}
+.week-card {
+  padding: 20px;
+}
+.market-card {
+  padding: 20px;
+}
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.section-heading h2 {
+  margin: 5px 0 0;
+  color: #3a4d40;
+  font-size: 16px;
+}
+.section-count {
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: #f0f5f0;
+  color: #7b8b7d;
+  font-size: 9px;
+}
+.day-tabs {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 7px;
+  margin: 19px 0;
+}
+.day-tabs button {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border: 1px solid #e8ede9;
+  border-radius: 8px;
+  background: #fff;
+  color: #849088;
+  cursor: pointer;
+}
+.day-tabs button small {
+  font-size: 8px;
+}
+.day-tabs button strong {
+  font-size: 12px;
+}
+.day-tabs button.selected {
+  border-color: #80aa88;
+  background: #edf6ef;
+  color: #39734e;
+}
+.day-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  border-top: 1px solid #edf1ed;
+}
+.day-heading h3 {
+  margin: 0;
+  color: #425449;
+  font-size: 13px;
+}
+.day-heading span {
+  color: #97a29a;
+  font-size: 9px;
+}
+.meal-list {
+  display: grid;
+}
+.meal-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 2px;
+  border-top: 1px solid #f0f3f0;
+}
+.meal-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 10px;
+  background: #f1f7f2;
+  color: #629271;
+  font-size: 16px;
+}
+.meal-copy {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+.meal-copy small {
+  color: #87938a;
+  font-size: 9px;
+}
+.meal-copy strong {
+  color: #435549;
+  font-size: 11px;
+}
+.portion {
+  color: #568060;
+  font-size: 10px;
+  font-weight: 750;
+}
+.empty-day {
+  display: grid;
+  justify-items: center;
+  padding: 31px 20px;
+  border-top: 1px solid #f0f3f0;
+  text-align: center;
+}
+.empty-day > span {
+  color: #77a082;
+  font-size: 22px;
+}
+.empty-day strong {
+  margin-top: 7px;
+  color: #54665a;
+  font-size: 11px;
+}
+.empty-day p {
+  max-width: 290px;
+  margin: 6px 0 0;
+  color: #99a39b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.market-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #edf5ef;
+  color: #61866b;
+  font-size: 17px;
+}
+.market-description {
+  margin: 9px 0 15px;
+  color: #88948c;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  color: #728077;
+  font-size: 9px;
+}
+.progress-label strong {
+  color: #538060;
+}
+.progress-track {
+  height: 6px;
+  margin: 7px 0 14px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #edf1ed;
+}
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #72a17b;
+  transition: width 0.2s;
+}
+.market-list {
+  display: grid;
+  max-height: 385px;
+  overflow: auto;
+}
+.market-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 2px;
+  border-top: 1px solid #f0f3f0;
+  cursor: pointer;
+}
+.market-item input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.checkmark {
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  flex: none;
+  border: 1px solid #d5dfd7;
+  border-radius: 5px;
+  color: #fff;
+}
+.market-item.checked .checkmark {
+  border-color: #5c9369;
+  background: #5c9369;
+}
+.market-item.checked .checkmark:after {
+  content: '✓';
+  font-size: 11px;
+}
+.market-food {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  color: #4e6053;
+  font-size: 10px;
+}
+.market-food small {
+  flex: none;
+  color: #8d9a90;
+  font-size: 9px;
+}
+.market-item.checked .market-food {
+  color: #9ba69e;
+  text-decoration: line-through;
+}
+.market-foot {
+  margin: 11px 0 0;
+  color: #a0aaa2;
+  font-size: 9px;
+}
+.market-empty {
+  color: #8b978e;
+  font-size: 10px;
+}
+.page-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 4px;
+  color: #99a39b;
+  font-size: 9px;
+}
+.no-plan {
+  display: grid;
+  justify-items: center;
+  margin-top: 28px;
+  padding: 58px 20px;
+  border: 1px solid #e8ede9;
+  border-radius: 14px;
+  background: white;
+  text-align: center;
+}
+.empty-icon {
+  display: grid;
+  place-items: center;
+  width: 55px;
+  height: 55px;
+  border-radius: 17px;
+  background: #edf6ef;
+  color: #639273;
+  font-size: 25px;
+}
+.no-plan h2 {
+  margin: 15px 0 0;
+  color: #3d5043;
+  font-size: 18px;
+}
+.no-plan p {
+  margin: 8px 0 15px;
+  color: #89958d;
+  font-size: 11px;
+}
+.no-plan a {
+  color: #347451;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+@media (max-width: 850px) {
+  .my-plan-page {
+    padding: 22px 18px 36px;
+  }
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  .market-list {
+    max-height: 300px;
+  }
+}
+@media (max-width: 520px) {
+  .back-row {
+    align-items: flex-start;
+    gap: 10px;
+    flex-direction: column;
+  }
+  .welcome-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 15px;
+  }
+  .welcome-card > div:nth-child(2) {
+    min-width: calc(100% - 70px);
+  }
+  .status-pill {
+    margin-left: 63px;
+  }
+  .week-card,
+  .market-card {
+    padding: 15px;
+  }
+  .day-tabs {
+    gap: 4px;
+  }
+  .day-tabs button {
+    padding: 7px 2px;
+  }
+  .page-foot {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
